@@ -178,10 +178,39 @@ function drawEnterName(){
 }
 
 state='start';reset();state='start';
+function drawStartScreen(){
+  cx.fillStyle='rgba(0,0,8,.82)';cx.fillRect(0,0,W,H);
+  const cx0=W/2,t=Date.now()*0.001;
+  const pulse=0.85+Math.sin(t*1.8)*0.15;
+  const letters=[{l:'S',c:'#ff00ff'},{l:'P',c:'#cc00ff'},{l:'A',c:'#00ffff'},{l:'C',c:'#ff00ff'},{l:'E',c:'#aa00ff'},{l:' ',c:'#fff'},{l:'R',c:'#00ffff'},{l:'O',c:'#ff0099'},{l:'L',c:'#ff00ff'},{l:'L',c:'#cc00ff'},{l:'R',c:'#00ffff'}];
+  const fontSize=52,letterW=36,totalW=letters.length*letterW;
+  const startX=cx0-totalW/2;
+  cx.font=`bold ${fontSize}px monospace`;
+  cx.textAlign='left';
+  letters.forEach((lt,i)=>{
+    if(lt.l===' ')return;
+    const x=startX+i*letterW;
+    const y=H/2-60+Math.sin(t*1.2+i*0.4)*6;
+    cx.shadowColor=lt.c;
+    cx.shadowBlur=18*pulse;
+    cx.fillStyle=lt.c;
+    cx.fillText(lt.l,x,y);
+    cx.shadowBlur=0;
+  });
+  cx.shadowBlur=0;
+  cx.textAlign='center';
+  cx.fillStyle='rgba(255,255,255,.6)';cx.font='13px monospace';
+  cx.fillText('Piletaster styr | Space hopp',cx0,H/2+4);
+  cx.fillStyle='#4cc9f0';cx.font='14px monospace';
+  cx.fillText('ENTER eller klikk for å spille',cx0,H/2+28);
+  drawHighscoreList(cx0,H/2+60);
+  cx.textAlign='left';
+}
+
 function loop(t){
   try{
     update(t);drawBg();drawTrack();drawFinishLine();drawParticles();drawBall();drawHUD();
-    if(state==='start')drawOverlay('BALLZY','','Piletaster styr | Space hopp');
+    if(state==='start')drawStartScreen();
     if(state==='dead')drawOverlay('GAME OVER','Score: '+score,'');
     if(state==='levelcomplete')drawLevelComplete();
     if(state==='enter_name')drawEnterName();
