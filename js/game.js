@@ -16,18 +16,33 @@ function mkRow(z){
 function getRow(wz){const i=Math.floor(wz)-tBase;return(i>=0&&i<track.length)?track[i]:null;}
 function growTrack(cZ){const need=Math.floor(cZ)+VIEW+6;while(tBase+track.length<=need)track.push(mkRow(tBase+track.length));while(tBase<Math.floor(cZ)-4&&track.length>0){track.shift();tBase++;}}
 
+function loadProgress(){try{return JSON.parse(localStorage.getItem('sr_progress'))||{unlocked:1,completed:[]};}catch(e){return{unlocked:1,completed:[]};}}
+function saveProgress(p){try{localStorage.setItem('sr_progress',JSON.stringify(p));}catch(e){}}
+function completeLevel(n){const p=loadProgress();if(!p.completed.includes(n))p.completed.push(n);p.unlocked=Math.max(p.unlocked,n+1);saveProgress(p);}
 function loadHS(){try{return JSON.parse(localStorage.getItem('ballzy_hs'))||[];}catch(e){return[];}}
 function saveHS(hs){try{localStorage.setItem('ballzy_hs',JSON.stringify(hs));}catch(e){}}
 function isHighscore(s){const hs=loadHS();return hs.length<5||s>hs[hs.length-1].score;}
 function addHS(name,s){const hs=loadHS();hs.push({name:name.slice(0,12),score:s});hs.sort((a,b)=>b.score-a.score);hs.splice(5);saveHS(hs);}
 
-let camZ,px,pvx,jy,jvy,spd,score,state,hi=0,pts=[],rot=0,currentLevel=0;
+let camZ,px,pvx,jy,jvy,spd,score,state,hi=0,pts=[],rot=0,currentLevel=0,gameMode='main',menuState='main';
 let nameInput='',enteringName=false;
 
 function reset(){camZ=0;px=0;pvx=0;jy=0;jvy=0;spd=CONFIG.BASE_SPEED;score=0;pts=[];rot=0;track=[];tBase=0;growTrack(0);state='play';}
 function die(){if(score>hi)hi=score;if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}else{state='dead';}}
 function go(){currentLevel=0;reset();}
-function nextLevel(){currentLevel++;camZ=0;px=0;pvx=0;jy=0;jvy=0;pts=[];rot=0;track=[];tBase=0;growTrack(0);}
+function startMainMode(){gameMode='main';currentLevel=0;menuState='play';reset();}
+function startLevel(n){gameMode='select';currentLevel=n;menuState='play';reset();}
+function nextLevel(){
+  completeLevel(currentLevel);
+  if(gameMode==='main'&&currentLevel+1<LEVELS.length){
+    currentLevel++;camZ=0;px=0;pvx=0;jy=0;jvy=0;pts=[];rot=0;track=[];tBase=0;growTrack(0);
+  } else {
+    completeLevel(currentLevel);
+    if(score>hi)hi=score;
+    if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}
+    else{state='levelcomplete';}
+  }
+}
 
 const K={};
 document.addEventListener('keydown',e=>{
@@ -40,14 +55,40 @@ document.addEventListener('keydown',e=>{
   }
   K[e.key]=1;
   if([' ','ArrowLeft','ArrowRight','ArrowUp'].includes(e.key))e.preventDefault();
-  if((state==='dead'||state==='start'||state==='levelcomplete')&&e.key==='Enter')go();
+  if(state==='dead'&&e.key==='Enter')go();if(state==='levelcomplete'&&e.key==='Enter'){state='start';menuState='main';}
 });
 document.addEventListener('keyup',e=>K[e.key]=0);
-cv.addEventListener('click',()=>{if(state==='dead'||state==='start'||state==='levelcomplete')go();});
+cv.addEventListener('click',(e)=>{handleClick(e);});
 
+function handleClick(e){
+  if(state==='dead'){go();return;}
+  if(state==='levelcomplete'){state='start';menuState='main';return;}
+  if(state==='start'){
+    if(menuState==='main'){
+      const rect=cv.getBoundingClientRect();
+      const mx=(e.clientX-rect.left)*(W/rect.width);
+      const my=(e.clientY-rect.top)*(H/rect.height);
+      if(mx>W/2-120&&mx<W/2-10&&my>H/2+20&&my<H/2+55){startMainMode();}
+      else if(mx>W/2+10&&mx<W/2+120&&my>H/2+20&&my<H/2+55){menuState='levelselect';}
+    } else if(menuState==='levelselect'){
+      const rect=cv.getBoundingClientRect();
+      const mx=(e.clientX-rect.left)*(W/rect.width);
+      const my=(e.clientY-rect.top)*(H/rect.height);
+      const p=loadProgress();
+      LEVELS.forEach((_,i)=>{
+        const bx=W/2-110+i*80,by=H/2+10;
+        if(mx>bx&&mx<bx+70&&my>by&&my<by+50){
+          if(i<p.unlocked)startLevel(i);
+        }
+      });
+      // Back button
+      if(mx>W/2-40&&mx<W/2+40&&my>H/2+80&&my<H/2+105){menuState='main';}
+    }
+  }
+}
 function readGamepad(){const pads=navigator.getGamepads?navigator.getGamepads():[];for(const p of pads){if(p)return{left:p.axes[0]<-0.3||p.buttons[14]?.pressed,right:p.axes[0]>0.3||p.buttons[15]?.pressed,jump:p.buttons[0]?.pressed||p.buttons[1]?.pressed,start:p.buttons[9]?.pressed||p.buttons[8]?.pressed};}return{};}
 let prevT=0;
-function update(t){const gp=readGamepad();if(state!=='play'){if((state==='dead'||state==='start'||state==='levelcomplete')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=camZ*12|0;spd=Math.min(CONFIG.BASE_SPEED+camZ*CONFIG.SPEED_GROWTH,CONFIG.MAX_SPEED);const left=K['ArrowLeft']||gp.left,right=K['ArrowRight']||gp.right,jump=K[' ']||K['ArrowUp']||gp.jump;pvx+=((right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0)-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ),col=Math.max(0,Math.min(COLS-1,Math.floor(px+THW))),solid=row&&row.c[col];if(jy>=0&&!solid){die();return;}if(solid&&jy>=0&&Math.abs(pvx)>1.5&&Math.random()<.15)spawnSpark();for(const p of pts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt;}pts=pts.filter(p=>p.life>0);growTrack(camZ);if(camZ+PZ>=currentLevelData().length){if(score>hi)hi=score;if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}else if(currentLevel+1<LEVELS.length){nextLevel();}else{state='levelcomplete';}}}
+function update(t){const gp=readGamepad();if(state!=='play'){if((state==='dead'||state==='start'||state==='levelcomplete')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=camZ*12|0;spd=Math.min(CONFIG.BASE_SPEED+camZ*CONFIG.SPEED_GROWTH,CONFIG.MAX_SPEED);const left=K['ArrowLeft']||gp.left,right=K['ArrowRight']||gp.right,jump=K[' ']||K['ArrowUp']||gp.jump;pvx+=((right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0)-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ),col=Math.max(0,Math.min(COLS-1,Math.floor(px+THW))),solid=row&&row.c[col];if(jy>=0&&!solid){die();return;}if(solid&&jy>=0&&Math.abs(pvx)>1.5&&Math.random()<.15)spawnSpark();for(const p of pts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt;}pts=pts.filter(p=>p.life>0);growTrack(camZ);if(camZ+PZ>=currentLevelData().length){nextLevel();}}
 function spawnSpark(){const p=pr(PZ),bx=W/2+(px/THW)*p.hw;for(let i=0;i<3;i++)pts.push({x:bx,y:p.y,vx:(Math.random()-.5)*100,vy:-50-Math.random()*60,life:.35,col:['#ff00ff','#00ffff','#aa00ff'][Math.floor(Math.random()*3)]});}
 
 const STARS=[];
@@ -178,6 +219,29 @@ function drawEnterName(){
 }
 
 state='start';reset();state='start';
+function drawLevelSelect(){
+  cx.fillStyle='rgba(0,0,8,.82)';cx.fillRect(0,0,W,H);
+  cx.textAlign='center';
+  cx.fillStyle='#e0b4ff';cx.font='bold 24px monospace';cx.fillText('VELG LEVEL',W/2,H/2-40);
+  const p=loadProgress();
+  LEVELS.forEach((_,i)=>{
+    const bx=W/2-110+i*80,by=H/2+10,bw=70,bh=50;
+    const unlocked=i<p.unlocked;
+    const completed=p.completed.includes(i);
+    cx.fillStyle=completed?'rgba(0,255,136,.2)':unlocked?'rgba(0,200,255,.15)':'rgba(80,80,80,.2)';
+    cx.fillRect(bx,by,bw,bh);
+    cx.strokeStyle=completed?'#00ff88':unlocked?'#00ffff':'#444';
+    cx.lineWidth=2;cx.strokeRect(bx,by,bw,bh);
+    cx.fillStyle=completed?'#00ff88':unlocked?'#fff':'#555';
+    cx.font='bold 18px monospace';
+    cx.fillText('L'+(i+1),bx+bw/2,by+28);
+    if(completed){cx.fillStyle='#00ff88';cx.font='10px monospace';cx.fillText('✓',bx+bw/2,by+42);}
+    else if(!unlocked){cx.fillStyle='#555';cx.font='14px monospace';cx.fillText('🔒',bx+bw/2,by+42);}
+  });
+  cx.fillStyle='rgba(255,255,255,.3)';cx.fillRect(W/2-40,H/2+80,80,25);
+  cx.fillStyle='#aaa';cx.font='12px monospace';cx.fillText('← TILBAKE',W/2,H/2+97);
+  cx.textAlign='left';
+}
 function drawStartScreen(){
   cx.fillStyle='rgba(0,0,8,.82)';cx.fillRect(0,0,W,H);
   const cx0=W/2,t=Date.now()*0.001;
@@ -199,18 +263,24 @@ function drawStartScreen(){
   });
   cx.shadowBlur=0;
   cx.textAlign='center';
-  cx.fillStyle='rgba(255,255,255,.6)';cx.font='13px monospace';
-  cx.fillText('Piletaster styr | Space hopp',cx0,H/2+4);
-  cx.fillStyle='#4cc9f0';cx.font='14px monospace';
-  cx.fillText('ENTER eller klikk for å spille',cx0,H/2+28);
-  drawHighscoreList(cx0,H/2+60);
+  cx.fillStyle='rgba(255,255,255,.5)';cx.font='12px monospace';
+  cx.fillText('Piletaster styr | Space hopp',cx0,H/2+10);
+  // Main Mode button
+  cx.fillStyle='rgba(0,255,255,.15)';cx.fillRect(cx0-120,H/2+20,110,35);
+  cx.strokeStyle='#00ffff';cx.lineWidth=1.5;cx.strokeRect(cx0-120,H/2+20,110,35);
+  cx.fillStyle='#00ffff';cx.font='bold 13px monospace';cx.fillText('MAIN MODE',cx0-65,H/2+43);
+  // Level select button
+  cx.fillStyle='rgba(170,0,255,.15)';cx.fillRect(cx0+10,H/2+20,110,35);
+  cx.strokeStyle='#aa00ff';cx.lineWidth=1.5;cx.strokeRect(cx0+10,H/2+20,110,35);
+  cx.fillStyle='#aa00ff';cx.font='bold 13px monospace';cx.fillText('VELG LEVEL',cx0+65,H/2+43);
+  drawHighscoreList(cx0,H/2+70);
   cx.textAlign='left';
 }
 
 function loop(t){
   try{
     update(t);drawBg();drawTrack();drawFinishLine();drawParticles();drawBall();drawHUD();
-    if(state==='start')drawStartScreen();
+    if(state==='start'&&menuState==='main')drawStartScreen();if(state==='start'&&menuState==='levelselect')drawLevelSelect();
     if(state==='dead')drawOverlay('GAME OVER','Score: '+score,'');
     if(state==='levelcomplete')drawLevelComplete();
     if(state==='enter_name')drawEnterName();
