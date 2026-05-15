@@ -45,6 +45,43 @@ function nextLevel(){
 }
 
 const K={};
+let touchSwipeX=0,touchStartX=0,touchStartY=0,touchActive=false,touchJump=false;
+
+cv.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(state!=='play'){
+    if(state==='dead'||state==='levelcomplete'){state='start';menuState='main';return;}
+    if(state==='start'){handleClick(e.changedTouches[0]);return;}
+    return;
+  }
+  const r=cv.getBoundingClientRect();
+  const t=e.changedTouches[0];
+  touchStartX=(t.clientX-r.left)*(W/r.width);
+  touchStartY=(t.clientY-r.top)*(H/r.height);
+  touchActive=true;
+  touchSwipeX=0;
+},{passive:false});
+
+cv.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(!touchActive||state!=='play')return;
+  const r=cv.getBoundingClientRect();
+  const t=e.changedTouches[0];
+  const tx=(t.clientX-r.left)*(W/r.width);
+  touchSwipeX=(tx-touchStartX)/80;
+  touchSwipeX=Math.max(-1,Math.min(1,touchSwipeX));
+},{passive:false});
+
+cv.addEventListener('touchend',e=>{
+  if(state!=='play'){touchActive=false;return;}
+  const r=cv.getBoundingClientRect();
+  const t=e.changedTouches[0];
+  const tx=(t.clientX-r.left)*(W/r.width);
+  const dx=Math.abs(tx-touchStartX);
+  if(dx<20)touchJump=true;
+  touchActive=false;
+  touchSwipeX=0;
+});
 document.addEventListener('keydown',e=>{
   if(enteringName){
     e.preventDefault();
@@ -87,7 +124,7 @@ function handleClick(e){
 }
 function readGamepad(){const pads=navigator.getGamepads?navigator.getGamepads():[];for(const p of pads){if(p)return{left:p.axes[0]<-0.3||p.buttons[14]?.pressed,right:p.axes[0]>0.3||p.buttons[15]?.pressed,jump:p.buttons[0]?.pressed||p.buttons[1]?.pressed,start:p.buttons[9]?.pressed||p.buttons[8]?.pressed};}return{};}
 let prevT=0;
-function update(t){const gp=readGamepad();if(state!=='play'){if((state==='dead'||state==='start'||state==='levelcomplete')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=camZ*12|0;spd=Math.min(CONFIG.BASE_SPEED+camZ*CONFIG.SPEED_GROWTH,CONFIG.MAX_SPEED);const left=K['ArrowLeft']||gp.left,right=K['ArrowRight']||gp.right,jump=K[' ']||K['ArrowUp']||gp.jump;pvx+=((right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0)-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ),col=Math.max(0,Math.min(COLS-1,Math.floor(px+THW))),solid=row&&row.c[col];if(jy>=0&&!solid){die();return;}if(solid&&jy>=0&&Math.abs(pvx)>1.5&&Math.random()<.15)spawnSpark();for(const p of pts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt;}pts=pts.filter(p=>p.life>0);growTrack(camZ);if(camZ+PZ>=currentLevelData().length){nextLevel();}}
+function update(t){const gp=readGamepad();if(state!=='play'){if((state==='dead'||state==='start'||state==='levelcomplete')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=camZ*12|0;spd=Math.min(CONFIG.BASE_SPEED+camZ*CONFIG.SPEED_GROWTH,CONFIG.MAX_SPEED);const left=K['ArrowLeft']||gp.left||(touchActive&&touchSwipeX<-0.1),right=K['ArrowRight']||gp.right||(touchActive&&touchSwipeX>0.1),jump=K[' ']||K['ArrowUp']||gp.jump||touchJump;touchJump=false;const swipeForce=touchActive&&Math.abs(touchSwipeX)>0.1?touchSwipeX*CONFIG.LATERAL_SPEED:0;pvx+=((right&&!touchActive?CONFIG.LATERAL_SPEED:left&&!touchActive?-CONFIG.LATERAL_SPEED:swipeForce)-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ),col=Math.max(0,Math.min(COLS-1,Math.floor(px+THW))),solid=row&&row.c[col];if(jy>=0&&!solid){die();return;}if(solid&&jy>=0&&Math.abs(pvx)>1.5&&Math.random()<.15)spawnSpark();for(const p of pts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt;}pts=pts.filter(p=>p.life>0);growTrack(camZ);if(camZ+PZ>=currentLevelData().length){nextLevel();}}
 function spawnSpark(){const p=pr(PZ),bx=W/2+(px/THW)*p.hw;for(let i=0;i<3;i++)pts.push({x:bx,y:p.y,vx:(Math.random()-.5)*100,vy:-50-Math.random()*60,life:.35,col:['#ff00ff','#00ffff','#aa00ff'][Math.floor(Math.random()*3)]});}
 
 const STARS=[];
