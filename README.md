@@ -2,7 +2,7 @@
 
 A fast-paced browser game where you guide a ball along floating neon platforms through space — dodge the gaps and survive as long as you can.
 
-🎮 **[Play Space Rollr](https://ohmygorseth.github.io/ballzy)**
+🎮 **[Play Space Rollr](https://ohmygorseth.github.io/spacerollr)**
 
 ---
 
