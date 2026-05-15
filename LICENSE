@@ -1,21 +1,260 @@
-MIT License
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ballzy — Banedesigner</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap');
+    :root{--bg:#04000f;--panel:#0a0020;--cyan:#00ffff;--purple:#aa00ff;--pink:#ff0099;--text:#e0d0ff;--dim:rgba(255,255,255,0.35);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px;}
+    h1{font-family:'Orbitron',monospace;font-size:2rem;letter-spacing:4px;background:linear-gradient(90deg,var(--cyan),#ff00ff,var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
+    .subtitle{color:var(--dim);font-size:12px;letter-spacing:2px;margin-bottom:24px;}
+    .main{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;justify-content:center;}
+    .panel{background:var(--panel);border:1px solid rgba(255,0,255,0.3);padding:16px;border-radius:4px;}
+    .panel h2{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;color:var(--cyan);margin-bottom:12px;border-bottom:1px solid rgba(0,255,255,0.2);padding-bottom:8px;}
+    #canvas-wrap{overflow-y:auto;max-height:80vh;border:1px solid rgba(0,255,255,0.2);border-radius:2px;cursor:crosshair;}
+    canvas{display:block;}
+    .controls{display:flex;flex-direction:column;gap:10px;min-width:180px;}
+    .btn{padding:10px 16px;border:1px solid;border-radius:2px;cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1px;transition:all .15s;background:transparent;width:100%;}
+    .btn-cyan{border-color:var(--cyan);color:var(--cyan);}
+    .btn-cyan:hover{background:rgba(0,255,255,0.1);box-shadow:0 0 12px rgba(0,255,255,0.3);}
+    .btn-pink{border-color:var(--pink);color:var(--pink);}
+    .btn-pink:hover{background:rgba(255,0,153,0.1);box-shadow:0 0 12px rgba(255,0,153,0.3);}
+    .btn-purple{border-color:var(--purple);color:var(--purple);}
+    .btn-purple:hover{background:rgba(170,0,255,0.1);}
+    .btn-dim{border-color:rgba(255,255,255,0.2);color:var(--dim);}
+    .btn-dim:hover{background:rgba(255,255,255,0.05);}
+    .stat{display:flex;justify-content:space-between;gap:16px;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+    .stat span:last-child{color:var(--cyan);}
+    #output-wrap{width:100%;max-width:700px;margin-top:20px;}
+    #output{width:100%;height:160px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,0,255,0.3);color:#aaf5f0;font-family:'Share Tech Mono',monospace;font-size:11px;padding:12px;resize:vertical;border-radius:2px;}
+    .copy-row{display:flex;gap:10px;margin-top:8px;align-items:center;}
+    .copy-msg{font-size:11px;color:var(--cyan);opacity:0;transition:opacity .3s;}
+    .row-ctrl{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+    .row-ctrl button{width:28px;height:28px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:var(--text);cursor:pointer;font-size:16px;border-radius:2px;}
+    .row-ctrl button:hover{border-color:var(--cyan);color:var(--cyan);}
+    .row-ctrl span{font-size:12px;color:var(--dim);min-width:80px;text-align:center;}
+  </style>
+</head>
+<body>
+  <h1>BALLZY</h1>
+  <div class="subtitle">⚡ BANEDESIGNER ⚡</div>
+  <div class="main">
+    <div class="panel">
+      <h2>BANE — KLIKK FOR Å TEGNE</h2>
+      <div class="row-ctrl">
+        <button onclick="removeRow()">−</button>
+        <span id="rowcount">1000 rader</span>
+        <button onclick="addRow()">+</button>
+      </div>
+      <div id="canvas-wrap">
+        <canvas id="gc"></canvas>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="panel">
+        <h2>STATISTIKK</h2>
+        <div class="stat"><span>Rader</span><span id="s-rows">1000</span></div>
+        <div class="stat"><span>Aktive tiles</span><span id="s-tiles">0</span></div>
+        <div class="stat"><span>Gap-seksjoner</span><span id="s-gaps">0</span></div>
+        <div class="stat"><span>Vanskelighet</span><span id="s-diff">—</span></div>
+        <div class="stat"><span>Maks poeng</span><span id="s-pts">0</span></div>
+      </div>
+      <div class="panel">
+        <h2>VERKTØY</h2>
+        <button class="btn btn-cyan" onclick="fillAll()">Fyll alle tiles</button><br><br>
+        <button class="btn btn-dim" onclick="clearAll()">Tøm alt</button><br><br>
+        <button class="btn btn-purple" onclick="mirrorH()">Speil horisontalt</button><br><br>
+        <button class="btn btn-dim" onclick="invertAll()">Inverter</button>
+      </div>
+      <div class="panel">
+        <h2>FORHÅNDSBYGG</h2>
+        <button class="btn btn-dim" onclick="preset('slalom')">Slalåm</button><br><br>
+        <button class="btn btn-dim" onclick="preset('islands')">Øyer</button><br><br>
+        <button class="btn btn-dim" onclick="preset('narrow')">Smal korridor</button>
+      </div>
+      <button class="btn btn-pink" onclick="generateCode()" style="margin-top:4px;">⚡ GENERER KODE</button>
+    </div>
+  </div>
+  <div id="output-wrap" class="panel">
+    <h2>KODE — LIM INN I SPILLET</h2>
+    <textarea id="output" readonly placeholder="Klikk '⚡ GENERER KODE' for å få koden..."></textarea>
+    <div class="copy-row">
+      <button class="btn btn-cyan" onclick="copyCode()" style="width:auto;padding:8px 20px;">Kopier</button>
+      <span class="copy-msg" id="copy-msg">✓ Kopiert!</span>
+    </div>
+  </div>
 
-Copyright (c) 2026 ohmygorseth
+  <script>
+    const CELL = 20, COLS = 4;
+    let ROWS = 1000;
+    let grid = [];
+    let painting = null;
+    let dirty = true;
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+    const canvas = document.getElementById('gc');
+    const ctx = canvas.getContext('2d');
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+    function initGrid() {
+      grid = [];
+      for (let r = 0; r < ROWS; r++) grid.push([1,1,1,1]);
+      resizeCanvas();
+      dirty = true;
+    }
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+    function resizeCanvas() {
+      canvas.width = COLS * CELL + 1;
+      canvas.height = ROWS * CELL + 1;
+      document.getElementById('rowcount').textContent = ROWS + ' rader';
+      document.getElementById('s-rows').textContent = ROWS;
+    }
+
+    function render() {
+      if (!dirty) return;
+      dirty = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(4,0,15,1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let r = 0; r < ROWS; r++) {
+        // Draw bottom-up: row 0 at bottom
+        const drawR = ROWS - 1 - r;
+        const y = drawR * CELL;
+        for (let c = 0; c < COLS; c++) {
+          const x = c * CELL;
+          if (grid[r][c]) {
+            ctx.fillStyle = 'rgba(10,0,30,0.95)';
+            ctx.fillRect(x+1, y+1, CELL-2, CELL-2);
+            const colors = ['#ff00ff','#00ffff','#aa00ff','#ff0099'];
+            ctx.fillStyle = colors[c] + '33';
+            ctx.fillRect(x+1, y+1, CELL-2, CELL-2);
+            ctx.strokeStyle = colors[c];
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x+1, y+1, CELL-2, CELL-2);
+            // Top glow line
+            ctx.fillStyle = colors[c];
+            ctx.fillRect(x+1, y+1, CELL-2, 2);
+          } else {
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(x+1, y+1, CELL-2, CELL-2);
+            ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x+1, y+1, CELL-2, CELL-2);
+          }
+        }
+      }
+      // Row number labels every 50 rows
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.font = '9px monospace';
+      for (let r = 0; r < ROWS; r += 50) {
+        const drawR = ROWS - 1 - r;
+        const y = drawR * CELL;
+        ctx.fillText(r, COLS * CELL + 3, y + CELL/2 + 3);
+      }
+      updateStats();
+    }
+
+    function rowFromY(y) {
+      const drawR = Math.floor(y / CELL);
+      return ROWS - 1 - drawR;
+    }
+
+    function getCellFromEvent(e) {
+      const wrap = document.getElementById('canvas-wrap');
+      const rect = canvas.getBoundingClientRect();
+      // canvas is not scaled — it renders at actual pixel size but CSS may shrink it
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const cx2 = (e.clientX - rect.left) * scaleX;
+      const cy2 = (e.clientY - rect.top) * scaleY + wrap.scrollTop * scaleY;
+      const c = Math.floor(cx2 / CELL);
+      const r = rowFromY(cy2);
+      return {r, c};
+    }
+
+        function getCellFromEvent(e) {
+      const wrap = document.getElementById('canvas-wrap');
+      const wrapRect = wrap.getBoundingClientRect();
+      const cx2 = e.clientX - wrapRect.left;
+      const cy2 = e.clientY - wrapRect.top + wrap.scrollTop;
+      const c = Math.floor(cx2 / CELL);
+      const r = rowFromY(cy2);
+      return {r, c};
+    }
+
+    canvas.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const {r, c} = getCellFromEvent(e);
+      if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
+      painting = grid[r][c] ? 0 : 1;
+      grid[r][c] = painting;
+      dirty = true;
+    });
+
+    canvas.addEventListener('mousemove', e => {
+      if (painting === null) return;
+      const {r, c} = getCellFromEvent(e);
+      if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
+      grid[r][c] = painting;
+      dirty = true;
+    });
+
+    document.addEventListener('mouseup', () => painting = null);
+
+    function updateStats() {
+      let tiles = 0, gaps = 0, inGap = false;
+      for (let r = 0; r < ROWS; r++) {
+        const empty = grid[r].every(v => v === 0);
+        if (empty) { if (!inGap) { gaps++; inGap = true; } } else { inGap = false; }
+        tiles += grid[r].filter(v => v).length;
+      }
+      document.getElementById('s-tiles').textContent = tiles;
+      document.getElementById('s-gaps').textContent = gaps;
+      document.getElementById('s-pts').textContent = ROWS * 12;
+      const ratio = 1 - tiles / (ROWS * 4);
+      const diff = ratio < 0.1 ? 'Lett' : ratio < 0.25 ? 'Medium' : ratio < 0.4 ? 'Vanskelig' : 'Ekstremt';
+      document.getElementById('s-diff').textContent = diff;
+    }
+
+    function addRow() { ROWS = Math.min(2000, ROWS+1); grid.push([1,1,1,1]); resizeCanvas(); dirty=true; }
+    function removeRow() { if(ROWS>5){ROWS--;grid.pop();resizeCanvas();dirty=true;} }
+    function fillAll() { grid=grid.map(()=>[1,1,1,1]); dirty=true; }
+    function clearAll() { grid=grid.map(()=>[0,0,0,0]); dirty=true; }
+    function invertAll() { grid=grid.map(r=>r.map(v=>v?0:1)); dirty=true; }
+    function mirrorH() { grid=grid.map(r=>[r[3],r[2],r[1],r[0]]); dirty=true; }
+
+    function preset(type) {
+      if(type==='slalom'){for(let r=0;r<ROWS;r++){const s=Math.floor(r/8)%3;grid[r]=s===0?[1,1,0,0]:s===1?[0,1,1,0]:[0,0,1,1];}}
+      else if(type==='islands'){for(let r=0;r<ROWS;r++)grid[r]=r%10<6?[1,1,1,1]:[0,0,0,0];}
+      else if(type==='narrow'){for(let r=0;r<ROWS;r++){if(r<ROWS*.3)grid[r]=[1,1,1,1];else if(r<ROWS*.6)grid[r]=[0,1,1,0];else grid[r]=[0,0,r%6<3?1:0,0];}}
+      dirty=true;
+    }
+
+    function generateCode() {
+      const rows = grid.map(r=>`  [${r.join(',')}]`).join(',\n');
+      document.getElementById('output').value = `const LEVEL1=[\n${rows}\n];`;
+    }
+
+    function copyCode() {
+      const ta=document.getElementById('output');ta.select();
+      navigator.clipboard.writeText(ta.value).catch(()=>document.execCommand('copy'));
+      const msg=document.getElementById('copy-msg');msg.style.opacity=1;
+      setTimeout(()=>msg.style.opacity=0,2000);
+    }
+
+    // Scroll to bottom on load (row 0 = bottom)
+    function scrollToBottom() {
+      const wrap = document.getElementById('canvas-wrap');
+      wrap.scrollTop = wrap.scrollHeight;
+    }
+
+    initGrid();
+    // Animation loop for dirty rendering
+    function loop() { render(); requestAnimationFrame(loop); }
+    requestAnimationFrame(loop);
+    setTimeout(scrollToBottom, 100);
+  </script>
+</body>
+</html>
