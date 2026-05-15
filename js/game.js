@@ -62,7 +62,7 @@ function drawBg(){
 }
 
 function drawTrack(){
-  const NEON=[['#ff00ff','#cc00cc','#ff66ff'],['#00ffff','#00aaaa','#66ffff'],['#aa00ff','#7700bb','#cc66ff'],['#ff0099','#bb006f','#ff66cc'],['#ff6600','#bb4400','#ff9944'],['#00ff88','#00aa55','#66ffaa'],['#ffff00','#aaaa00','#ffff66'],['#ff4444','#aa1111','#ff8888']];
+  const NEON=[['#ff00ff','#cc00cc','#ff66ff'],['#00ffff','#00aaaa','#66ffff'],['#aa00ff','#7700bb','#cc66ff'],['#ff0099','#bb006f','#ff66cc']];
   const pulse=0.85+Math.sin(Date.now()*0.004)*0.15;
   for(let i=VIEW;i>=0;i--){
     const wz=Math.floor(camZ)+i,df=wz-camZ,db=wz+1-camZ;
