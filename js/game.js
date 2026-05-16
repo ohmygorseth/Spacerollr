@@ -375,7 +375,7 @@ function drawStartScreen(){
 
 function loop(t){
   try{
-    update(t);drawBg();drawTrack();drawFinishLine();drawParticles();drawBall();drawHUD();if(state==='play')drawTouchBtns();
+    update(t);drawBg();drawTrack();drawFinishLine();drawParticles();drawBall();drawHUD();
     if(state==='start'&&menuState==='main')drawStartScreen();if(state==='start'&&menuState==='levelselect')drawLevelSelect();
     if(state==='dead')drawOverlay('GAME OVER','Score: '+score,'');
     if(state==='levelcomplete')drawLevelComplete();
