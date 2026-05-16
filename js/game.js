@@ -268,12 +268,16 @@ function drawSpaceBg(){
   cx.globalAlpha=1;
 }
 function drawOverlay(title,sub1,sub2){
-  cx.fillStyle='rgba(0,0,8,.75)';cx.fillRect(0,0,W,H);cx.textAlign='center';
-  cx.fillStyle='#e0b4ff';cx.font='bold 44px Share Tech Mono, monospace';cx.fillText(title,W/2,H/2-80);
-  cx.fillStyle='#fff';cx.font='19px Share Tech Mono, monospace';cx.fillText(sub1,W/2,H/2-40);
-  cx.fillStyle='rgba(255,255,255,.5)';cx.font='13px Share Tech Mono, monospace';cx.fillText(sub2,W/2,H/2-18);
-  drawHighscoreList(W/2,H/2+20);
-  cx.fillStyle='#4cc9f0';cx.font='14px Share Tech Mono, monospace';cx.fillText('ENTER eller klikk for å spille',W/2,H-20);
+  const cx0=W/2;
+  cx.fillStyle='rgba(0,0,8,.75)';cx.fillRect(0,0,W,H);
+  cx.textAlign='center';
+  cx.fillStyle='#e0b4ff';cx.font='bold 36px Share Tech Mono, monospace';cx.fillText(title,cx0,H*0.25);
+  if(gameMode!=='select'){
+    if(sub1){cx.fillStyle='#fff';cx.font='17px Share Tech Mono, monospace';cx.fillText(sub1,cx0,H*0.25+40);}
+    drawHighscoreList(cx0,H*0.25+70);
+  }
+  cx.fillStyle='#4cc9f0';cx.font='13px Share Tech Mono, monospace';
+  cx.fillText('ENTER / KLIKK FOR Å PRØVE IGJEN',cx0,H-20);
   cx.textAlign='left';
 }
 
