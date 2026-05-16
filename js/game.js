@@ -93,8 +93,9 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('keyup',e=>K[e.key]=0);
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&(state==='dead'||state==='levelcomplete')){
-    state='start';menuState='main';
+  if(e.key==='Escape'){
+    if(state==='play'){state='start';menuState='main';currentLevel=0;scoreOffset=0;}
+    else if(state==='dead'||state==='levelcomplete'){state='start';menuState='main';currentLevel=0;}
   }
 });
 cv.addEventListener('click',(e)=>{handleClick(e);});
@@ -161,7 +162,7 @@ function drawTrack(){
       ng.addColorStop(0,nc[2]+'33');ng.addColorStop(0.5,nc[0]+'55');ng.addColorStop(1,nc[2]+'33');
       cx.fillStyle=ng;cx.fill();
       cx.globalAlpha=1;
-      cx.shadowColor=nc[0];cx.shadowBlur=8*pulse*fade;
+      cx.shadowColor='transparent';cx.shadowBlur=0;
       cx.strokeStyle=nc[0];cx.lineWidth=1.5;
       cx.beginPath();cx.moveTo(x1f,pF.y);cx.lineTo(x2f,pF.y);cx.stroke();
       cx.lineWidth=0.8;
@@ -172,8 +173,7 @@ function drawTrack(){
       // Bakre kant
       cx.lineWidth=0.6;
       cx.beginPath();cx.moveTo(x1b,pB.y);cx.lineTo(x2b,pB.y);cx.stroke();
-      cx.shadowBlur=0;
-    }
+      }
   }
 }
 
