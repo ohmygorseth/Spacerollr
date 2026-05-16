@@ -277,7 +277,7 @@ function drawOverlay(title,sub1,sub2){
     drawHighscoreList(cx0,H*0.25+70);
   }
   cx.fillStyle='#4cc9f0';cx.font='13px Share Tech Mono, monospace';
-  cx.fillText('ENTER / KLIKK FOR Å PRØVE IGJEN',cx0,H-20);
+  cx.fillText('ENTER / CLICK TO TRY AGAIN',cx0,H-20);
   cx.textAlign='left';
 }
 
@@ -289,12 +289,12 @@ function drawLevelComplete(){
   drawPanel(px2,py2,pw,ph,'#00ff88');
   cx.textAlign='center';
   cx.fillStyle='#00ff88';cx.font='bold 14px Share Tech Mono, monospace';
-  cx.fillText(gameMode==='select'?'LEVEL COMPLETE!':'LEVEL FULLFØRT!',cx0,py2+24);
+  cx.fillText(gameMode==='select'?'LEVEL COMPLETE!':'LEVEL COMPLETE!',cx0,py2+24);
   if(gameMode!=='select'){
     cx.fillStyle='#fff';cx.font='15px Share Tech Mono, monospace';cx.fillText('Score: '+score,cx0,py2+50);
-    if(hi){cx.fillStyle='rgba(255,255,255,.5)';cx.font='11px Share Tech Mono, monospace';cx.fillText('Beste: '+hi,cx0,py2+70);}
+    if(hi){cx.fillStyle='rgba(255,255,255,.5)';cx.font='11px Share Tech Mono, monospace';cx.fillText('Best: '+hi,cx0,py2+70);}
   }
-  const btnLabel=gameMode==='select'?'ENTER / KLIKK FOR Å PRØVE IGJEN':'ENTER / KLIKK FOR Å FORTSETTE';
+  const btnLabel=gameMode==='select'?'ENTER / CLICK TO TRY AGAIN':'ENTER / CLICK TO CONTINUE';
   drawNeonBtn(px2+10,py2+ph-44,pw-20,32,btnLabel,'#00ff88');
   cx.textAlign='left';
 }
@@ -310,10 +310,10 @@ function drawEnterName(){
   cx.textAlign='center';
   cx.fillStyle='#ffd700';cx.font='bold 15px Share Tech Mono, monospace';cx.fillText(placeStr,cx0,py2+22);
   cx.fillStyle='#fff';cx.font='13px Share Tech Mono, monospace';cx.fillText('Score: '+score,cx0,py2+44);
-  cx.fillStyle='rgba(255,255,255,.5)';cx.font='10px Share Tech Mono, monospace';cx.fillText('SKRIV INN NAVN:',cx0,py2+64);
+  cx.fillStyle='rgba(255,255,255,.5)';cx.font='10px Share Tech Mono, monospace';cx.fillText('ENTER YOUR NAME:',cx0,py2+64);
   drawPanel(px2+20,py2+72,pw-40,34,'#00ffff');
   cx.fillStyle='#fff';cx.font='bold 15px Share Tech Mono, monospace';cx.fillText(nameInput+'|',cx0,py2+95);
-  cx.fillStyle='rgba(255,255,255,.35)';cx.font='10px Share Tech Mono, monospace';cx.fillText('ENTER FOR Å LAGRE',cx0,py2+ph-12);
+  cx.fillStyle='rgba(255,255,255,.35)';cx.font='10px Share Tech Mono, monospace';cx.fillText('PRESS ENTER TO SAVE',cx0,py2+ph-12);
   cx.textAlign='left';
 }
 
@@ -349,7 +349,7 @@ function drawLevelSelect(){
   const pw=300,ph=150,px2=cx0-pw/2,py2=H*0.33;
   drawPanel(px2,py2,pw,ph,'#aa00ff');
   cx.textAlign='center';cx.fillStyle='#aa00ff';cx.font='bold 11px Share Tech Mono, monospace';
-  cx.fillText('VELG LEVEL',cx0,py2+16);
+  cx.fillText('SELECT LEVEL',cx0,py2+16);
   const p=loadProgress();
   LEVELS.forEach(function(_,i){
     const bx=cx0-((LEVELS.length*80)/2)+(i*80)+5,by=py2+28,bw=70,bh=50;
@@ -361,7 +361,7 @@ function drawLevelSelect(){
     if(completed){cx.fillStyle='#00ff88';cx.font='11px Share Tech Mono, monospace';cx.fillText('✓',bx+bw/2,by+42);}
     else if(!unlocked){cx.fillStyle='#555';cx.font='13px Share Tech Mono, monospace';cx.fillText('🔒',bx+bw/2,by+42);}
   });
-  drawNeonBtn(cx0-55,py2+ph-42,110,30,'← TILBAKE','rgba(255,255,255,0.3)');
+  drawNeonBtn(cx0-55,py2+ph-42,110,30,'← BACK','rgba(255,255,255,0.3)');
   cx.textAlign='left';
 }
 
@@ -380,13 +380,13 @@ function drawStartScreen(){
   drawSpaceRollrLogo(cx0,H*0.22);
   cx.textAlign='center';
   cx.fillStyle='rgba(255,255,255,.25)';cx.font='10px Share Tech Mono, monospace';
-  cx.fillText('← → STYR  |  SPACE HOPP  |  ESC MENY',cx0,H*0.22+20);
+  cx.fillText('← → MOVE   |   SPACE JUMP',cx0,H*0.22+20);
   const pw=260,ph=110,px2=cx0-pw/2,py2=H*0.33;
   drawPanel(px2,py2,pw,ph,'#aa00ff');
   cx.textAlign='center';cx.fillStyle='rgba(170,0,255,.5)';cx.font='9px Share Tech Mono, monospace';
-  cx.fillText('VELG MODUS',cx0,py2+14);
+  cx.fillText('SELECT MODE',cx0,py2+14);
   drawNeonBtn(px2+10,py2+22,115,36,'MAIN MODE','#00ffff');
-  drawNeonBtn(px2+135,py2+22,115,36,'VELG LEVEL','#aa00ff');
+  drawNeonBtn(px2+135,py2+22,115,36,'SELECT LEVEL','#aa00ff');
   const hp=200,hpx=cx0-hp/2,hpy=py2+ph+10;
   drawPanel(hpx,hpy,hp,120,'#ff0099');
   drawHighscoreList(cx0,hpy+18);
