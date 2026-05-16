@@ -33,6 +33,7 @@ function go(){currentLevel=0;scoreOffset=0;reset();}
 function startMainMode(){gameMode='main';currentLevel=0;scoreOffset=0;menuState='main';reset();}
 function startLevel(n){gameMode='select';currentLevel=n;scoreOffset=0;menuState='play';reset();}
 function nextLevel(){
+  console.log('nextLevel called, gameMode='+gameMode+' currentLevel='+currentLevel+' LEVELS.length='+LEVELS.length);
   completeLevel(currentLevel);
   if(gameMode==='main'&&currentLevel+1<LEVELS.length){
     scoreOffset+=camZ;currentLevel++;camZ=0;px=0;pvx=0;jy=0;jvy=0;pts=[];rot=0;track=[];tBase=0;state='play';growTrack(0);
