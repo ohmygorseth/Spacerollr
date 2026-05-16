@@ -285,13 +285,17 @@ function drawLevelComplete(){
   const cx0=W/2;
   drawSpaceBg();
   drawSpaceRollrLogo(cx0,H*0.22);
-  const pw=260,ph=120,px2=cx0-pw/2,py2=H*0.34;
+  const pw=260,ph=gameMode==='select'?90:120,px2=cx0-pw/2,py2=H*0.34;
   drawPanel(px2,py2,pw,ph,'#00ff88');
   cx.textAlign='center';
-  cx.fillStyle='#00ff88';cx.font='bold 14px Share Tech Mono, monospace';cx.fillText('LEVEL FULLFØRT!',cx0,py2+24);
-  cx.fillStyle='#fff';cx.font='15px Share Tech Mono, monospace';cx.fillText('Score: '+score,cx0,py2+50);
-  if(hi){cx.fillStyle='rgba(255,255,255,.5)';cx.font='11px Share Tech Mono, monospace';cx.fillText('Beste: '+hi,cx0,py2+70);}
-  drawNeonBtn(px2+20,py2+ph-44,pw-40,32,'ENTER / KLIKK FOR Å FORTSETTE','#00ff88');
+  cx.fillStyle='#00ff88';cx.font='bold 14px Share Tech Mono, monospace';
+  cx.fillText(gameMode==='select'?'LEVEL COMPLETE!':'LEVEL FULLFØRT!',cx0,py2+24);
+  if(gameMode!=='select'){
+    cx.fillStyle='#fff';cx.font='15px Share Tech Mono, monospace';cx.fillText('Score: '+score,cx0,py2+50);
+    if(hi){cx.fillStyle='rgba(255,255,255,.5)';cx.font='11px Share Tech Mono, monospace';cx.fillText('Beste: '+hi,cx0,py2+70);}
+  }
+  const btnLabel=gameMode==='select'?'ENTER / KLIKK FOR Å PRØVE IGJEN':'ENTER / KLIKK FOR Å FORTSETTE';
+  drawNeonBtn(px2+10,py2+ph-44,pw-20,32,btnLabel,'#00ff88');
   cx.textAlign='left';
 }
 
