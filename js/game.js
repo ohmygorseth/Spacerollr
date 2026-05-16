@@ -373,8 +373,13 @@ function drawStartScreen(){
 
 function loop(t){
   try{
-    update(t);drawBg();drawTrack();drawFinishLine();drawParticles();drawBall();drawHUD();
-    if(state==='start'&&menuState==='main')drawStartScreen();if(state==='start'&&menuState==='levelselect')drawLevelSelect();
+    update(t);
+    if(state==='start'){
+      if(menuState==='main')drawStartScreen();
+      else if(menuState==='levelselect')drawLevelSelect();
+    } else {
+      drawBg();drawTrack();drawFinishLine();drawParticles();drawBall();drawHUD();
+    }
     if(state==='dead')drawOverlay('GAME OVER','Score: '+score,'');
     if(state==='levelcomplete')drawLevelComplete();
     if(state==='enter_name')drawEnterName();
