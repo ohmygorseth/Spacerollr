@@ -384,7 +384,7 @@ function loop(t){
       else if(menuState==='levelselect')drawLevelSelect();
     } else {
       drawBg();drawTrack();drawFinishLine();drawParticles();drawBall();drawHUD();
-      if(state==='dead')drawOverlay('GAME OVER','Score: '+score,'');
+      if(state==='dead')drawOverlay('GAME OVER',gameMode==='select'?'':'Score: '+score,'');
       if(state==='levelcomplete')drawLevelComplete();
       if(state==='enter_name')drawEnterName();
     }
