@@ -31,7 +31,7 @@ function reset(){camZ=0;px=0;pvx=0;jy=0;jvy=0;spd=CONFIG.BASE_SPEED;score=0;pts=
 function die(){if(score>hi)hi=score;if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}else{state='dead';}}
 function go(){currentLevel=0;scoreOffset=0;reset();}
 function startMainMode(){gameMode='main';currentLevel=0;scoreOffset=0;menuState='main';reset();}
-function startLevel(n){gameMode='select';currentLevel=n;scoreOffset=0;menuState='play';reset();}
+function startLevel(n){gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
 function nextLevel(){
   console.log('nextLevel called, gameMode='+gameMode+' currentLevel='+currentLevel+' LEVELS.length='+LEVELS.length);
   completeLevel(currentLevel);
