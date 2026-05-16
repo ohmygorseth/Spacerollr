@@ -229,10 +229,10 @@ function drawHighscoreList(x,y){
     cx.fillText('No scores yet',x,y+20);
   } else {
     hs.slice(0,5).forEach((e,i)=>{
-      const rank=(i+1)+'.';
       cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.6)';
       cx.font=(i<3?'bold ':'')+'12px Share Tech Mono, monospace';
-      cx.fillText(rank+' '+e.name+' — '+e.score,x,y+18+i*19);
+      const row=(i+1)+'.  '+e.name+'  —  '+e.score;
+      cx.fillText(row,x,y+18+i*19);
     });
   }
   cx.textAlign='left';
