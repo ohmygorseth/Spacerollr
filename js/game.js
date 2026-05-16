@@ -371,6 +371,7 @@ function drawStartScreen(){
   cx.textAlign='left';
 }
 
+state='start';reset();state='start';
 function loop(t){
   try{
     update(t);
