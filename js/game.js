@@ -329,6 +329,16 @@ function drawTouchBtns(){
     cx.font='bold 22px Share Tech Mono, monospace';cx.textAlign='center';
     cx.fillText(lbl,x+bw/2,by+34);
   });
+  // Mobile warning
+  const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  if(isMobile){
+    const ww=320,wh=44,wx=cx0-ww/2,wy=H-60;
+    cx.fillStyle='rgba(255,160,0,.15)';cx.fillRect(wx,wy,ww,wh);
+    cx.strokeStyle='#ffaa00';cx.lineWidth=1;cx.strokeRect(wx,wy,ww,wh);
+    cx.fillStyle='#ffaa00';cx.font='11px Share Tech Mono, monospace';cx.textAlign='center';
+    cx.fillText('⚠️ Dette spillet er best på PC',cx0,wy+18);
+    cx.fillText('med tastatur',cx0,wy+33);
+  }
   cx.textAlign='left';
 }
 
