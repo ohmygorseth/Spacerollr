@@ -11,7 +11,7 @@ let track=[],tBase=0;
 function mkRow(z){
   const i=Math.floor(z);
   if(i>=currentLevelData().length){return{c:[1,1,1,1],e:'n'};}
-  return{c:LEVEL1[Math.min(i,currentLevelData().length-1)].slice(),e:'n'};
+  const lvl=currentLevelData();return{c:lvl[Math.min(i,lvl.length-1)].slice(),e:'n'};
 }
 function getRow(wz){const i=Math.floor(wz)-tBase;return(i>=0&&i<track.length)?track[i]:null;}
 function growTrack(cZ){const need=Math.floor(cZ)+VIEW+6;while(tBase+track.length<=need)track.push(mkRow(tBase+track.length));while(tBase<Math.floor(cZ)-4&&track.length>0){track.shift();tBase++;}}
@@ -36,7 +36,7 @@ function nextLevel(){
   console.log('nextLevel called, gameMode='+gameMode+' currentLevel='+currentLevel+' LEVELS.length='+LEVELS.length);
   completeLevel(currentLevel);
   if(gameMode==='main'&&currentLevel+1<LEVELS.length){
-    scoreOffset+=camZ;currentLevel++;camZ=0;px=0;pvx=0;jy=0;jvy=0;pts=[];rot=0;track=[];tBase=0;state='play';growTrack(0);
+    scoreOffset+=camZ;currentLevel++;camZ=0;px=0;pvx=0;jy=0;jvy=0;pts=[];rot=0;track=[];tBase=0;state='play';console.log('Starting level '+currentLevel);growTrack(0);
   } else {
     completeLevel(currentLevel);
     if(score>hi)hi=score;
