@@ -211,7 +211,7 @@ function drawFinishLine(){
     cx.textAlign='center';
     cx.fillStyle='rgba(255,215,0,'+(1-dist/12)+')';
     cx.font='bold 16px Share Tech Mono, monospace';
-    cx.fillText('🏁 MÅL!', W/2, p.y - 12);
+    cx.fillText('🏁 END OF LEVEL '+(currentLevel+1), W/2, p.y - 12);
     cx.textAlign='left';
   }
 }
