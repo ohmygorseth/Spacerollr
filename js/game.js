@@ -107,24 +107,25 @@ function handleClick(e){
   if(state==='dead'){go();return;}
   if(state==='levelcomplete'){state='start';menuState='main';return;}
   if(state==='start'){
+    const rect=cv.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)*(W/rect.width);
+    const my=(e.clientY-rect.top)*(H/rect.height);
     if(menuState==='main'){
-      const rect=cv.getBoundingClientRect();
-      const mx=(e.clientX-rect.left)*(W/rect.width);
-      const my=(e.clientY-rect.top)*(H/rect.height);
-      const btn1x=W/2-135,btn1y=H*0.42,btnW=120,btnH=44;if(mx>btn1x&&mx<btn1x+btnW&&my>btn1y&&my<btn1y+btnH){startMainMode();}else if(mx>W/2+15&&mx<W/2+15+btnW&&my>btn1y&&my<btn1y+btnH){menuState='levelselect';}
+      // Match drawStartScreen: pw=260, buttons at py2=H*0.33+22, h=36
+      const px2=W/2-130,py2=H*0.33+22,btnW=115,btnH=36;
+      if(mx>px2+10&&mx<px2+10+btnW&&my>py2&&my<py2+btnH){startMainMode();}
+      else if(mx>px2+135&&mx<px2+135+btnW&&my>py2&&my<py2+btnH){menuState='levelselect';}
     } else if(menuState==='levelselect'){
-      const rect=cv.getBoundingClientRect();
-      const mx=(e.clientX-rect.left)*(W/rect.width);
-      const my=(e.clientY-rect.top)*(H/rect.height);
+      // Match drawLevelSelect: pw=300, py2=H*0.33, bx/by coords
+      const cx0=W/2,py2=H*0.33,ph=150;
       const p=loadProgress();
       LEVELS.forEach((_,i)=>{
-        const bx=W/2-110+i*80,by=H/2+10;
-        if(mx>bx&&mx<bx+70&&my>by&&my<by+50){
+        const bx=cx0-((LEVELS.length*80)/2)+(i*80)+5,by=py2+28,bw=70,bh=50;
+        if(mx>bx&&mx<bx+bw&&my>by&&my<by+bh){
           if(i<p.unlocked)startLevel(i);
         }
       });
-      // Back button
-      if(mx>W/2-40&&mx<W/2+40&&my>H/2+80&&my<H/2+105){menuState='main';}
+      if(mx>cx0-55&&mx<cx0+55&&my>py2+ph-42&&my<py2+ph-12){menuState='main';}
     }
   }
 }
