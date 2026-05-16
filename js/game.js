@@ -220,9 +220,21 @@ function drawParticles(){for(const p of pts){cx.beginPath();cx.arc(p.x,p.y,Math.
 function drawHUD(){if(gameMode==='select')return;cx.textAlign='left';cx.fillStyle='#fff';cx.font='bold 17px Share Tech Mono, monospace';cx.fillText('SCORE '+score,10,24);if(hi){cx.fillStyle='rgba(255,255,255,.4)';cx.font='11px Share Tech Mono, monospace';cx.fillText('BEST '+hi,10,39);}cx.textAlign='left';}
 
 function drawHighscoreList(x,y){
-  const hs=loadHS();cx.textAlign='center';cx.fillStyle='#e0b4ff';cx.font='bold 15px Share Tech Mono, monospace';cx.fillText('🏆 HIGHSCORE',x,y);
-  if(hs.length===0){cx.fillStyle='rgba(255,255,255,.4)';cx.font='12px Share Tech Mono, monospace';cx.fillText('Ingen scores ennå',x,y+24);}
-  else{hs.forEach((e,i)=>{const medal=['🥇','🥈','🥉','4.','5.'][i];cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.7)';cx.font='13px Share Tech Mono, monospace';cx.fillText(`${medal} ${e.name} — ${e.score}`,x,y+22+i*20);});}
+  const hs=loadHS();
+  cx.textAlign='center';
+  cx.fillStyle='#ff0099';cx.font='bold 12px Share Tech Mono, monospace';
+  cx.fillText('HIGHSCORE',x,y);
+  if(!hs.length){
+    cx.fillStyle='rgba(255,255,255,.4)';cx.font='11px Share Tech Mono, monospace';
+    cx.fillText('No scores yet',x,y+20);
+  } else {
+    hs.slice(0,5).forEach((e,i)=>{
+      const rank=(i+1)+'.';
+      cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.6)';
+      cx.font=(i<3?'bold ':'')+'12px Share Tech Mono, monospace';
+      cx.fillText(rank+' '+e.name+' — '+e.score,x,y+18+i*19);
+    });
+  }
   cx.textAlign='left';
 }
 
