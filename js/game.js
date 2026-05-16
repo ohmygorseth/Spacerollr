@@ -382,12 +382,15 @@ function loop(t){
     if(state==='start'){
       if(menuState==='main')drawStartScreen();
       else if(menuState==='levelselect')drawLevelSelect();
+    } else if(state==='dead'){
+      drawOverlay('GAME OVER','Score: '+score,'');
+    } else if(state==='levelcomplete'){
+      drawLevelComplete();
+    } else if(state==='enter_name'){
+      drawEnterName();
     } else {
       drawBg();drawTrack();drawFinishLine();drawParticles();drawBall();drawHUD();
     }
-    if(state==='dead')drawOverlay('GAME OVER','Score: '+score,'');
-    if(state==='levelcomplete')drawLevelComplete();
-    if(state==='enter_name')drawEnterName();
   }catch(err){console.error(err);}
   requestAnimationFrame(loop);
 }
