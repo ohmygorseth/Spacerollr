@@ -122,7 +122,7 @@ function handleClick(e){
       LEVELS.forEach((_,i)=>{
         const bx=cx0-((LEVELS.length*80)/2)+(i*80)+5,by=py2+28,bw=70,bh=50;
         if(mx>bx&&mx<bx+bw&&my>by&&my<by+bh){
-          if(i<p.unlocked)startLevel(i);
+          startLevel(i);
         }
       });
       if(mx>cx0-55&&mx<cx0+55&&my>py2+ph-42&&my<py2+ph-12){menuState='main';}
@@ -365,7 +365,7 @@ function drawLevelSelect(){
   const p=loadProgress();
   LEVELS.forEach(function(_,i){
     const bx=cx0-((LEVELS.length*80)/2)+(i*80)+5,by=py2+28,bw=70,bh=50;
-    const unlocked=i<p.unlocked,completed=p.completed.includes(i);
+    const unlocked=true,completed=p.completed.includes(i);
     const col=completed?'#00ff88':unlocked?'#00ffff':'#333';
     drawPanel(bx,by,bw,bh,col);
     cx.fillStyle=col;cx.font='bold 15px Share Tech Mono, monospace';cx.textAlign='center';
