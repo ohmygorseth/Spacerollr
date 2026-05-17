@@ -32,7 +32,7 @@ let camZ,px,pvx,jy,jvy,spd,score,state,hi=0,pts=[],rot=0,currentLevel=0,gameMode
 let nameInput='',enteringName=false;
 
 function reset(){camZ=0;px=0;pvx=0;jy=0;jvy=0;spd=CONFIG.BASE_SPEED;score=0;pts=[];rot=0;track=[];tBase=0;growTrack(0);state='play';}
-function die(){stopMusic();playDie();if(gameMode==='select'){state='dead';return;}if(score>hi)hi=score;if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}else{state='dead';}}
+function die(){stopMusic();playDie();fetchGlobalScores();if(gameMode==='select'){state='dead';return;}if(score>hi)hi=score;if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}else{state='dead';}}
 function go(){if(gameMode==='select'){scoreOffset=999;playMusic(currentLevel);reset();}else{currentLevel=0;scoreOffset=0;playMusic(0);reset();}}
 function startMainMode(){AC.resume();playMusic(0);gameMode='main';currentLevel=0;scoreOffset=0;menuState='main';reset();}
 function startLevel(n){AC.resume();playMusic(n);gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
@@ -423,10 +423,10 @@ async function fetchGlobalScores(){
 async function submitGlobalScore(name,score){
   if(window.fbSubmitScore){
     await window.fbSubmitScore(name,score);
-    await setTimeout(fetchGlobalScores, 1000);
+    await setTimeout(fetchGlobalScores,500);setInterval(fetchGlobalScores,15000);
   }
 }
-setTimeout(fetchGlobalScores, 1000);
+setTimeout(fetchGlobalScores,500);setInterval(fetchGlobalScores,15000);
 
 // ===== AUDIO =====
 const AC = new (window.AudioContext||window.webkitAudioContext)();
