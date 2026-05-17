@@ -166,7 +166,7 @@ function drawTrack(){
       ng.addColorStop(0,nc[2]+'33');ng.addColorStop(0.5,nc[0]+'55');ng.addColorStop(1,nc[2]+'33');
       cx.fillStyle=ng;cx.fill();
       cx.globalAlpha=1;
-      cx.shadowColor='transparent';cx.shadowBlur=0;
+      cx.shadowBlur=0;
       cx.strokeStyle=nc[0];cx.lineWidth=1.5;
       cx.beginPath();cx.moveTo(x1f,pF.y);cx.lineTo(x2f,pF.y);cx.stroke();
       cx.lineWidth=0.8;
@@ -181,7 +181,6 @@ function drawTrack(){
   }
 }
 
-
 function drawFinishLine(){
   const finishZ = currentLevelData().length - 5;
   const dist = finishZ - camZ;
@@ -191,8 +190,8 @@ function drawFinishLine(){
   const pulse = 0.7 + Math.sin(Date.now()*0.006)*0.3;
   const x1 = W/2 - p.hw, x2 = W/2 + p.hw;
   // Glow
-  cx.shadowColor = '#ffd700';
-  cx.shadowBlur = 18 * pulse;
+  
+  cx.shadowBlur=0;
   cx.strokeStyle = '#ffd700';
   cx.lineWidth = 3;
   cx.beginPath();
@@ -205,7 +204,7 @@ function drawFinishLine(){
     cx.fillStyle = i%2===0 ? 'rgba(255,215,0,0.8)' : 'rgba(255,255,255,0.8)';
     cx.fillRect(x1+i*sq, p.y-4, sq, 4);
   }
-  cx.shadowBlur = 0;
+  cx.shadowBlur=0;
   // Label når du er nærme
   if(dist < 12){
     cx.textAlign='center';
@@ -396,15 +395,6 @@ function drawLevelSelect(){
   cx.textAlign='left';
 }
 
-
-
-
-
-
-
-
-
-
 function drawStartScreen(){
   const cx0=W/2;
   drawSpaceBg();
@@ -423,7 +413,6 @@ function drawStartScreen(){
   cx.textAlign='left';
 }
 
-
 // ===== GLOBAL LEADERBOARD =====
 let globalScores=[];
 async function fetchGlobalScores(){
@@ -434,10 +423,10 @@ async function fetchGlobalScores(){
 async function submitGlobalScore(name,score){
   if(window.fbSubmitScore){
     await window.fbSubmitScore(name,score);
-    await fetchGlobalScores();
+    await setTimeout(fetchGlobalScores, 1000);
   }
 }
-fetchGlobalScores();
+setTimeout(fetchGlobalScores, 1000);
 
 // ===== AUDIO =====
 const AC = new (window.AudioContext||window.webkitAudioContext)();
