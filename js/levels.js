@@ -1,1 +1,1 @@
-const LEVELS = [LEVEL1, LEVEL2];
+const LEVELS = [LEVEL1, LEVEL2, LEVEL3];
