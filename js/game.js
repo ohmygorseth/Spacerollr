@@ -34,12 +34,12 @@ let nameInput='',enteringName=false;
 function reset(){camZ=0;px=0;pvx=0;jy=0;jvy=0;spd=CONFIG.BASE_SPEED;score=0;pts=[];rot=0;track=[];tBase=0;growTrack(0);state='play';}
 function die(){playDie();if(gameMode==='select'){state='dead';return;}if(score>hi)hi=score;if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}else{state='dead';}}
 function go(){if(gameMode==='select'){scoreOffset=999;reset();}else{currentLevel=0;scoreOffset=0;reset();}}
-function startMainMode(){AC.resume();startAmbience();gameMode='main';currentLevel=0;scoreOffset=0;menuState='main';reset();}
-function startLevel(n){AC.resume();startAmbience();gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
+function startMainMode(){AC.resume();playMusic(0);gameMode='main';currentLevel=0;scoreOffset=0;menuState='main';reset();}
+function startLevel(n){AC.resume();playMusic(n);gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
 function nextLevel(){
   completeLevel(currentLevel);
   if(gameMode==='main'&&currentLevel+1<LEVELS.length){
-    scoreOffset+=camZ;currentLevel++;camZ=0;px=0;pvx=0;jy=0;jvy=0;pts=[];rot=0;track=[];tBase=0;state='play';growTrack(0);
+    scoreOffset+=camZ;currentLevel++;camZ=0;px=0;pvx=0;jy=0;jvy=0;pts=[];rot=0;track=[];tBase=0;state='play';playMusic(currentLevel);growTrack(0);
   } else {
     completeLevel(currentLevel);
     if(score>hi)hi=score;
@@ -97,8 +97,8 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('keyup',e=>K[e.key]=0);
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
-    if(state==='play'){state='start';menuState='main';currentLevel=0;scoreOffset=0;}
-    else if(state==='dead'||state==='levelcomplete'){state='start';menuState='main';currentLevel=0;}
+    if(state==='play'){stopMusic();state='start';menuState='main';currentLevel=0;scoreOffset=0;}
+    else if(state==='dead'||state==='levelcomplete'){stopMusic();state='start';menuState='main';currentLevel=0;}
   }
 });
 cv.addEventListener('click',(e)=>{handleClick(e);});
@@ -412,11 +412,11 @@ const AC = new (window.AudioContext||window.webkitAudioContext)();
 function playJump(){
   const o=AC.createOscillator(),g=AC.createGain();
   o.connect(g);g.connect(AC.destination);
-  o.type='sine';o.frequency.setValueAtTime(320,AC.currentTime);
-  o.frequency.exponentialRampToValueAtTime(520,AC.currentTime+0.12);
-  g.gain.setValueAtTime(0.18,AC.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.18);
-  o.start();o.stop(AC.currentTime+0.18);
+  o.type='sine';o.frequency.setValueAtTime(220,AC.currentTime);
+  o.frequency.exponentialRampToValueAtTime(340,AC.currentTime+0.1);
+  g.gain.setValueAtTime(0.06,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.15);
+  o.start();o.stop(AC.currentTime+0.15);
 }
 
 function playDie(){
@@ -451,29 +451,21 @@ function playFinish(){
   });
 }
 
-// Background ambience
-let ambienceNode=null;
-function startAmbience(){
-  if(ambienceNode)return;
-  const buf=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);
-  const d=buf.getChannelData(0);
-  for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*0.015;
-  const src=AC.createBufferSource();
-  src.buffer=buf;src.loop=true;
-  const f=AC.createBiquadFilter();
-  f.type='lowpass';f.frequency.value=400;
-  const g=AC.createGain();g.gain.value=0.4;
-  src.connect(f);f.connect(g);g.connect(AC.destination);
-  src.start();ambienceNode=src;
-  // Low drone
-  const o=AC.createOscillator(),g2=AC.createGain();
-  o.type='sine';o.frequency.value=55;
-  g2.gain.value=0.04;
-  o.connect(g2);g2.connect(AC.destination);
-  o.start();
+// Music system
+const TRACKS=['audio/level1.mp3','audio/level2.mp3'];
+let musicEl=null,currentTrack=-1;
+function playMusic(level){
+  const idx=Math.min(level,TRACKS.length-1);
+  if(idx===currentTrack)return;
+  if(musicEl){musicEl.pause();musicEl.currentTime=0;}
+  currentTrack=idx;
+  musicEl=new Audio(TRACKS[idx]);
+  musicEl.loop=true;
+  musicEl.volume=0.5;
+  musicEl.play().catch(()=>{});
 }
-function stopAmbience(){
-  if(ambienceNode){ambienceNode.stop();ambienceNode=null;}
+function stopMusic(){
+  if(musicEl){musicEl.pause();musicEl.currentTime=0;currentTrack=-1;}
 }
 state='start';reset();state='start';
 function loop(t){
