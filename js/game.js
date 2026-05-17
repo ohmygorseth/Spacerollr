@@ -221,18 +221,33 @@ function drawHUD(){if(gameMode==='select')return;cx.textAlign='left';cx.fillStyl
 
 function drawHighscoreList(x,y){
   const hs=loadHS();
-  cx.textAlign='center';
-  cx.fillStyle='#ff0099';cx.font='bold 12px Share Tech Mono, monospace';
-  cx.fillText('HIGHSCORE',x,y);
+  const col=x-90;
+  cx.textAlign='left';
+  // Local
+  cx.fillStyle='#00ffff';cx.font='bold 11px Share Tech Mono, monospace';
+  cx.fillText('YOU',col,y);
   if(!hs.length){
-    cx.fillStyle='rgba(255,255,255,.4)';cx.font='11px Share Tech Mono, monospace';
-    cx.fillText('No scores yet',x,y+20);
+    cx.fillStyle='rgba(255,255,255,.3)';cx.font='10px Share Tech Mono, monospace';
+    cx.fillText('No scores yet',col,y+16);
   } else {
     hs.slice(0,5).forEach((e,i)=>{
-      cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.6)';
-      cx.font=(i<3?'bold ':'')+'12px Share Tech Mono, monospace';
-      const row=(i+1)+'.  '+e.name+'  —  '+e.score;
-      cx.fillText(row,x,y+18+i*19);
+      cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.5)';
+      cx.font=(i<3?'bold ':'')+'11px Share Tech Mono, monospace';
+      cx.fillText((i+1)+'. '+e.name+' — '+e.score,col,y+14+i*17);
+    });
+  }
+  // Global
+  const gcol=x+10;
+  cx.fillStyle='#aa00ff';cx.font='bold 11px Share Tech Mono, monospace';
+  cx.fillText('WORLD',gcol,y);
+  if(!globalScores.length){
+    cx.fillStyle='rgba(255,255,255,.3)';cx.font='10px Share Tech Mono, monospace';
+    cx.fillText('Loading...',gcol,y+16);
+  } else {
+    globalScores.slice(0,5).forEach((e,i)=>{
+      cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.5)';
+      cx.font=(i<3?'bold ':'')+'11px Share Tech Mono, monospace';
+      cx.fillText((i+1)+'. '+e.name+' — '+e.score,gcol,y+14+i*17);
     });
   }
   cx.textAlign='left';
@@ -399,12 +414,27 @@ function drawStartScreen(){
   cx.fillText('SELECT MODE',cx0,py2+14);
   drawNeonBtn(px2+10,py2+22,115,36,'MAIN MODE','#00ffff');
   drawNeonBtn(px2+135,py2+22,115,36,'SELECT LEVEL','#aa00ff');
-  const hp=200,hpx=cx0-hp/2,hpy=py2+ph+10;
+  const hp=280,hpx=cx0-hp/2,hpy=py2+ph+10;
   drawPanel(hpx,hpy,hp,120,'#ff0099');
   drawHighscoreList(cx0,hpy+18);
   cx.textAlign='left';
 }
 
+
+// ===== GLOBAL LEADERBOARD =====
+let globalScores=[];
+async function fetchGlobalScores(){
+  if(window.fbGetScores){
+    globalScores=await window.fbGetScores();
+  }
+}
+async function submitGlobalScore(name,score){
+  if(window.fbSubmitScore){
+    await window.fbSubmitScore(name,score);
+    await fetchGlobalScores();
+  }
+}
+fetchGlobalScores();
 
 // ===== AUDIO =====
 const AC = new (window.AudioContext||window.webkitAudioContext)();
