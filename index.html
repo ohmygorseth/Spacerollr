@@ -8,10 +8,10 @@
 </head>
 <body>
   <canvas id="c"></canvas>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-    import { getDatabase, ref, push, query, orderByChild, limitToLast, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-app-compat.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-database-compat.min.js"></script>
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBM5Ory6ZSESYsL68u7HGGVATQpT5mB3GQ",
       authDomain: "space-rollr.firebaseapp.com",
@@ -22,22 +22,22 @@
       appId: "1:546982544672:web:e06512218c64128fa38345"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    // Global functions for game.js to use
-    window.fbSubmitScore = async function(name, score) {
-      await push(ref(db, 'scores'), { name, score, ts: Date.now() });
+    window.fbSubmitScore = function(name, score) {
+      return db.ref('scores').push({ name, score, ts: Date.now() });
     };
 
-    window.fbGetScores = async function() {
-      const q = query(ref(db, 'scores'), orderByChild('score'), limitToLast(10));
-      const snap = await get(q);
-      const scores = [];
-      snap.forEach(child => scores.push(child.val()));
-      return scores.sort((a,b) => b.score - a.score);
+    window.fbGetScores = function() {
+      return db.ref('scores').orderByChild('score').limitToLast(10).get().then(function(snap) {
+        const scores = [];
+        snap.forEach(function(child) { scores.push(child.val()); });
+        return scores.sort(function(a,b) { return b.score - a.score; });
+      });
     };
   </script>
+
   <script src="js/config.js"></script>
   <script src="js/level1.js"></script>
   <script src="js/level2.js"></script>
