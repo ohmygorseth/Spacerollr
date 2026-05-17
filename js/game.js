@@ -452,7 +452,7 @@ function playFinish(){
 }
 
 // Music system
-const TRACKS=['audio/level1.mp3','audio/level2.mp3'];
+const TRACKS=['audio/level1.mp3','audio/level2.mp3','audio/level3.mp3','audio/level4.mp3','audio/level5.mp3'];
 let musicEl=null,currentTrack=-1;
 function playMusic(level){
   const idx=Math.min(level,TRACKS.length-1);
