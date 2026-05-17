@@ -221,33 +221,37 @@ function drawHUD(){if(gameMode==='select')return;cx.textAlign='left';cx.fillStyl
 
 function drawHighscoreList(x,y){
   const hs=loadHS();
-  const col=x-90;
-  cx.textAlign='left';
-  // Local
+  const pw=130,ph=112,gap=10;
+  const lx=x-pw-gap/2,rx=x+gap/2;
+
+  // YOU panel
+  drawPanel(lx,y,pw,ph,'#00ffff');
+  cx.textAlign='center';
   cx.fillStyle='#00ffff';cx.font='bold 11px Share Tech Mono, monospace';
-  cx.fillText('YOU',col,y);
+  cx.fillText('YOU',lx+pw/2,y+14);
   if(!hs.length){
     cx.fillStyle='rgba(255,255,255,.3)';cx.font='10px Share Tech Mono, monospace';
-    cx.fillText('No scores yet',col,y+16);
+    cx.fillText('No scores yet',lx+pw/2,y+34);
   } else {
     hs.slice(0,5).forEach((e,i)=>{
       cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.5)';
-      cx.font=(i<3?'bold ':'')+'11px Share Tech Mono, monospace';
-      cx.fillText((i+1)+'. '+e.name+' — '+e.score,col,y+14+i*17);
+      cx.font=(i<3?'bold ':'')+'10px Share Tech Mono, monospace';
+      cx.fillText((i+1)+'. '+e.name+' '+e.score,lx+pw/2,y+28+i*17);
     });
   }
-  // Global
-  const gcol=x+10;
+
+  // WORLD panel
+  drawPanel(rx,y,pw,ph,'#aa00ff');
   cx.fillStyle='#aa00ff';cx.font='bold 11px Share Tech Mono, monospace';
-  cx.fillText('WORLD',gcol,y);
+  cx.fillText('WORLD',rx+pw/2,y+14);
   if(!globalScores.length){
     cx.fillStyle='rgba(255,255,255,.3)';cx.font='10px Share Tech Mono, monospace';
-    cx.fillText('Loading...',gcol,y+16);
+    cx.fillText('Loading...',rx+pw/2,y+34);
   } else {
     globalScores.slice(0,5).forEach((e,i)=>{
       cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.5)';
-      cx.font=(i<3?'bold ':'')+'11px Share Tech Mono, monospace';
-      cx.fillText((i+1)+'. '+e.name+' — '+e.score,gcol,y+14+i*17);
+      cx.font=(i<3?'bold ':'')+'10px Share Tech Mono, monospace';
+      cx.fillText((i+1)+'. '+e.name+' '+e.score,rx+pw/2,y+28+i*17);
     });
   }
   cx.textAlign='left';
@@ -414,9 +418,8 @@ function drawStartScreen(){
   cx.fillText('SELECT MODE',cx0,py2+14);
   drawNeonBtn(px2+10,py2+22,115,36,'MAIN MODE','#00ffff');
   drawNeonBtn(px2+135,py2+22,115,36,'SELECT LEVEL','#aa00ff');
-  const hp=280,hpx=cx0-hp/2,hpy=py2+ph+10;
-  drawPanel(hpx,hpy,hp,120,'#ff0099');
-  drawHighscoreList(cx0,hpy+18);
+  const hpy=py2+ph+10;
+  drawHighscoreList(cx0,hpy);
   cx.textAlign='left';
 }
 
