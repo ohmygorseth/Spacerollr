@@ -30,10 +30,10 @@
     };
 
     window.fbGetScores = function() {
-      return db.ref('scores').orderByChild('score').limitToLast(10).get().then(function(snap) {
+      return db.ref('scores').get().then(function(snap) {
         const scores = [];
         snap.forEach(function(child) { scores.push(child.val()); });
-        return scores.sort(function(a,b) { return b.score - a.score; });
+        return scores.sort(function(a,b) { return b.score - a.score; }).slice(0,10);
       });
     };
   </script>
