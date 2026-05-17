@@ -26,17 +26,18 @@
     const db = firebase.database();
 
     window.fbSubmitScore = function(name, score) {
-      return db.ref('scores').push({ name: name, score: score, ts: Date.now() }).then(function(){ return true; });
+      return db.ref('scores').push({ name: name, score: score, ts: Date.now() });
     };
 
+    // Realtime listener - updates globalScores automatically
+    db.ref('scores').on('value', function(snap) {
+      var scores = [];
+      snap.forEach(function(child) { scores.push(child.val()); });
+      window.globalScoresCache = scores.sort(function(a,b) { return b.score - a.score; }).slice(0,10);
+    });
+
     window.fbGetScores = function() {
-      return new Promise(function(resolve) {
-        db.ref('scores').once('value', function(snap) {
-          const scores = [];
-          snap.forEach(function(child) { scores.push(child.val()); });
-          resolve(scores.sort(function(a,b) { return b.score - a.score; }).slice(0,10));
-        }, function(err) { resolve([]); });
-      });
+      return Promise.resolve(window.globalScoresCache || []);
     };
   </script>
 
