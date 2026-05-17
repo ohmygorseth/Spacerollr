@@ -414,7 +414,7 @@ function playJump(){
   o.connect(g);g.connect(AC.destination);
   o.type='sine';o.frequency.setValueAtTime(220,AC.currentTime);
   o.frequency.exponentialRampToValueAtTime(340,AC.currentTime+0.1);
-  g.gain.setValueAtTime(0.06,AC.currentTime);
+  g.gain.setValueAtTime(0.12,AC.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.15);
   o.start();o.stop(AC.currentTime+0.15);
 }
@@ -461,7 +461,7 @@ function playMusic(level){
   currentTrack=idx;
   musicEl=new Audio(TRACKS[idx]);
   musicEl.loop=true;
-  musicEl.volume=0.5;
+  musicEl.volume=0.15;
   musicEl.play().catch(()=>{});
 }
 function stopMusic(){
