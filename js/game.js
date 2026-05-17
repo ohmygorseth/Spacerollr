@@ -32,10 +32,10 @@ let camZ,px,pvx,jy,jvy,spd,score,state,hi=0,pts=[],rot=0,currentLevel=0,gameMode
 let nameInput='',enteringName=false;
 
 function reset(){camZ=0;px=0;pvx=0;jy=0;jvy=0;spd=CONFIG.BASE_SPEED;score=0;pts=[];rot=0;track=[];tBase=0;growTrack(0);state='play';}
-function die(){if(gameMode==='select'){state='dead';return;}if(score>hi)hi=score;if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}else{state='dead';}}
+function die(){playDie();if(gameMode==='select'){state='dead';return;}if(score>hi)hi=score;if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}else{state='dead';}}
 function go(){if(gameMode==='select'){scoreOffset=999;reset();}else{currentLevel=0;scoreOffset=0;reset();}}
-function startMainMode(){gameMode='main';currentLevel=0;scoreOffset=0;menuState='main';reset();}
-function startLevel(n){gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
+function startMainMode(){AC.resume();startAmbience();gameMode='main';currentLevel=0;scoreOffset=0;menuState='main';reset();}
+function startLevel(n){AC.resume();startAmbience();gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
 function nextLevel(){
   completeLevel(currentLevel);
   if(gameMode==='main'&&currentLevel+1<LEVELS.length){
@@ -131,7 +131,7 @@ function handleClick(e){
 }
 function readGamepad(){const pads=navigator.getGamepads?navigator.getGamepads():[];for(const p of pads){if(p)return{left:p.axes[0]<-0.3||p.buttons[14]?.pressed,right:p.axes[0]>0.3||p.buttons[15]?.pressed,jump:p.buttons[0]?.pressed||p.buttons[1]?.pressed,start:p.buttons[9]?.pressed||p.buttons[8]?.pressed};}return{};}
 let prevT=0;
-function update(t){const gp=readGamepad();if(state!=='play'){if((state==='dead'||state==='start')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=(scoreOffset+camZ)*12|0;spd=Math.min(CONFIG.BASE_SPEED+(scoreOffset+camZ)*CONFIG.SPEED_GROWTH,CONFIG.MAX_SPEED);const left=K['ArrowLeft']||tL||gp.left,right=K['ArrowRight']||tR||gp.right,jump=K[' ']||K['ArrowUp']||tJ||gp.jump;pvx+=((right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0)-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ),col=Math.max(0,Math.min(COLS-1,Math.floor(px+THW))),solid=row&&row.c[col];if(jy>=0&&!solid){die();return;}if(solid&&jy>=0&&Math.abs(pvx)>1.5&&Math.random()<.15)spawnSpark();for(const p of pts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt;}pts=pts.filter(p=>p.life>0);growTrack(camZ);if(camZ+PZ>=currentLevelData().length){if(gameMode==='select'){state='levelcomplete';}else{nextLevel();}}}
+function update(t){const gp=readGamepad();if(state!=='play'){if((state==='dead'||state==='start')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=(scoreOffset+camZ)*12|0;spd=Math.min(CONFIG.BASE_SPEED+(scoreOffset+camZ)*CONFIG.SPEED_GROWTH,CONFIG.MAX_SPEED);const left=K['ArrowLeft']||tL||gp.left,right=K['ArrowRight']||tR||gp.right,jump=K[' ']||K['ArrowUp']||tJ||gp.jump;pvx+=((right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0)-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ),col=Math.max(0,Math.min(COLS-1,Math.floor(px+THW))),solid=row&&row.c[col];if(jy>=0&&!solid){die();return;}if(solid&&jy>=0&&Math.abs(pvx)>1.5&&Math.random()<.15)spawnSpark();for(const p of pts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt;}pts=pts.filter(p=>p.life>0);growTrack(camZ);if(camZ+PZ>=currentLevelData().length){playFinish();if(gameMode==='select'){state='levelcomplete';}else{nextLevel();}}}
 function spawnSpark(){const p=pr(PZ),bx=W/2+(px/THW)*p.hw;for(let i=0;i<3;i++)pts.push({x:bx,y:p.y,vx:(Math.random()-.5)*100,vy:-50-Math.random()*60,life:.35,col:['#ff00ff','#00ffff','#aa00ff'][Math.floor(Math.random()*3)]});}
 
 const STARS=[];
@@ -405,6 +405,76 @@ function drawStartScreen(){
   cx.textAlign='left';
 }
 
+
+// ===== AUDIO =====
+const AC = new (window.AudioContext||window.webkitAudioContext)();
+
+function playJump(){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.connect(g);g.connect(AC.destination);
+  o.type='sine';o.frequency.setValueAtTime(320,AC.currentTime);
+  o.frequency.exponentialRampToValueAtTime(520,AC.currentTime+0.12);
+  g.gain.setValueAtTime(0.18,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.18);
+  o.start();o.stop(AC.currentTime+0.18);
+}
+
+function playDie(){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.connect(g);g.connect(AC.destination);
+  o.type='sawtooth';o.frequency.setValueAtTime(280,AC.currentTime);
+  o.frequency.exponentialRampToValueAtTime(40,AC.currentTime+0.4);
+  g.gain.setValueAtTime(0.3,AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.4);
+  o.start();o.stop(AC.currentTime+0.4);
+  // Extra crunch
+  const o2=AC.createOscillator(),g2=AC.createGain();
+  o2.connect(g2);g2.connect(AC.destination);
+  o2.type='square';o2.frequency.setValueAtTime(120,AC.currentTime);
+  o2.frequency.exponentialRampToValueAtTime(30,AC.currentTime+0.3);
+  g2.gain.setValueAtTime(0.15,AC.currentTime);
+  g2.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+0.3);
+  o2.start();o2.stop(AC.currentTime+0.3);
+}
+
+function playFinish(){
+  const notes=[440,554,659,880];
+  notes.forEach((freq,i)=>{
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.connect(g);g.connect(AC.destination);
+    o.type='sine';o.frequency.setValueAtTime(freq,AC.currentTime+i*0.12);
+    g.gain.setValueAtTime(0,AC.currentTime+i*0.12);
+    g.gain.linearRampToValueAtTime(0.2,AC.currentTime+i*0.12+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+i*0.12+0.3);
+    o.start(AC.currentTime+i*0.12);
+    o.stop(AC.currentTime+i*0.12+0.3);
+  });
+}
+
+// Background ambience
+let ambienceNode=null;
+function startAmbience(){
+  if(ambienceNode)return;
+  const buf=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*0.015;
+  const src=AC.createBufferSource();
+  src.buffer=buf;src.loop=true;
+  const f=AC.createBiquadFilter();
+  f.type='lowpass';f.frequency.value=400;
+  const g=AC.createGain();g.gain.value=0.4;
+  src.connect(f);f.connect(g);g.connect(AC.destination);
+  src.start();ambienceNode=src;
+  // Low drone
+  const o=AC.createOscillator(),g2=AC.createGain();
+  o.type='sine';o.frequency.value=55;
+  g2.gain.value=0.04;
+  o.connect(g2);g2.connect(AC.destination);
+  o.start();
+}
+function stopAmbience(){
+  if(ambienceNode){ambienceNode.stop();ambienceNode=null;}
+}
 state='start';reset();state='start';
 function loop(t){
   try{
