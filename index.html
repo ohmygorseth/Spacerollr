@@ -26,14 +26,16 @@
     const db = firebase.database();
 
     window.fbSubmitScore = function(name, score) {
-      return db.ref('scores').push({ name, score, ts: Date.now() });
+      return db.ref('scores').push({ name: name, score: score, ts: Date.now() }).then(function(){ return true; });
     };
 
     window.fbGetScores = function() {
-      return db.ref('scores').get().then(function(snap) {
-        const scores = [];
-        snap.forEach(function(child) { scores.push(child.val()); });
-        return scores.sort(function(a,b) { return b.score - a.score; }).slice(0,10);
+      return new Promise(function(resolve) {
+        db.ref('scores').once('value', function(snap) {
+          const scores = [];
+          snap.forEach(function(child) { scores.push(child.val()); });
+          resolve(scores.sort(function(a,b) { return b.score - a.score; }).slice(0,10));
+        }, function(err) { resolve([]); });
       });
     };
   </script>
