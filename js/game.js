@@ -109,6 +109,16 @@ document.addEventListener('keydown',e=>{
   }
 });
 cv.addEventListener('click',(e)=>{handleClick(e);});
+
+cv.addEventListener('wheel',(e)=>{
+  if(state==='start'||state==='dead'||state==='levelcomplete'){
+    const gs=getGlobalScores();
+    if(gs.length>10){
+      worldScrollY=Math.max(0,Math.min(worldScrollY+e.deltaY,(gs.length-10)*17));
+      e.preventDefault();
+    }
+  }
+},{passive:false});
 cv.addEventListener('mousedown',(e)=>{if(state==='play'&&e.button===0){jvy=CONFIG.JUMP_VY;playJump();}});
 
 function handleClick(e){
@@ -425,7 +435,7 @@ function drawStartScreen(){
 }
 
 // ===== GLOBAL LEADERBOARD =====
-let globalScores=[];
+let globalScores=[],worldScrollY=0;
 async function fetchGlobalScores(){
   if(window.fbGetScores){
     try{
