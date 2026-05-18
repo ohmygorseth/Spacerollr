@@ -251,11 +251,11 @@ function drawHighscoreList(x,y){
   drawPanel(rx,y,pw,ph,'#aa00ff');
   cx.fillStyle='#aa00ff';cx.font='bold 11px Share Tech Mono, monospace';
   cx.fillText('WORLD',rx+pw/2,y+14);
-  if(!globalScores.length){
+  const gs=getGlobalScores();if(!gs.length){
     cx.fillStyle='rgba(255,255,255,.3)';cx.font='10px Share Tech Mono, monospace';
     cx.fillText('Loading...',rx+pw/2,y+34);
   } else {
-    globalScores.slice(0,5).forEach((e,i)=>{
+    gs.slice(0,5).forEach((e,i)=>{
       cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.5)';
       cx.font=(i<3?'bold ':'')+'10px Share Tech Mono, monospace';
       cx.fillText((i+1)+'. '+e.name+' '+e.score,rx+pw/2,y+28+i*17);
