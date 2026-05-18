@@ -26,7 +26,7 @@ function completeLevel(n){const p=loadProgress();if(!p.completed.includes(n))p.c
 function loadHS(){try{return JSON.parse(localStorage.getItem('ballzy_hs'))||[];}catch(e){return[];}}
 function saveHS(hs){try{localStorage.setItem('ballzy_hs',JSON.stringify(hs));}catch(e){}}
 function isHighscore(s){const hs=loadHS();return hs.length<5||s>hs[hs.length-1].score;}
-function addHS(name,s){const hs=loadHS();hs.push({name:name.slice(0,12),score:s});hs.sort((a,b)=>b.score-a.score);hs.splice(5);saveHS(hs);}
+function addHS(name,s){const hs=loadHS();hs.push({name:name.slice(0,12),score:s});hs.sort((a,b)=>b.score-a.score);hs.splice(10);saveHS(hs);if(window.fbSubmitScore)window.fbSubmitScore(name.slice(0,12),s);}
 
 let camZ,px,pvx,jy,jvy,spd,score,state,hi=0,pts=[],rot=0,currentLevel=0,gameMode='main',menuState='main',scoreOffset=0;
 let nameInput='',enteringName=false;
