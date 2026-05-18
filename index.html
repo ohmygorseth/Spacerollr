@@ -33,7 +33,7 @@
     db.ref('scores').on('value', function(snap) {
       var scores = [];
       snap.forEach(function(child) { scores.push(child.val()); });
-      window.globalScoresCache = scores.sort(function(a,b) { return b.score - a.score; }).slice(0,10);
+      window.globalScoresCache = scores.sort(function(a,b) { return b.score - a.score; }).slice(0,100);
     });
 
     window.fbGetScores = function() {
