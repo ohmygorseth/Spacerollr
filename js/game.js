@@ -226,9 +226,12 @@ function drawBall(){const p=pr(PZ),bx=W/2+(px/THW)*p.hw,gY=p.y-BR,by=gY+jy;cx.be
 function drawParticles(){for(const p of pts){cx.beginPath();cx.arc(p.x,p.y,Math.max(1,3*p.life),0,Math.PI*2);cx.fillStyle=p.col+(Math.min(255,(p.life*2*255)|0).toString(16).padStart(2,'0'));cx.fill();}}
 function drawHUD(){if(gameMode==='select')return;cx.textAlign='left';cx.fillStyle='#fff';cx.font='bold 17px Share Tech Mono, monospace';cx.fillText('SCORE '+score,10,24);if(hi){cx.fillStyle='rgba(255,255,255,.4)';cx.font='11px Share Tech Mono, monospace';cx.fillText('BEST '+hi,10,39);}cx.textAlign='left';}
 
+function getGlobalScores(){
+  return window.globalScoresCache||globalScores||[];
+}
 function drawHighscoreList(x,y){
   const hs=loadHS();
-  const pw=130,ph=112,gap=10;
+  const pw=130,ph=200,gap=10;
   const lx=x-pw-gap/2,rx=x+gap/2;
 
   // YOU panel
@@ -240,7 +243,7 @@ function drawHighscoreList(x,y){
     cx.fillStyle='rgba(255,255,255,.3)';cx.font='10px Share Tech Mono, monospace';
     cx.fillText('No scores yet',lx+pw/2,y+34);
   } else {
-    hs.slice(0,5).forEach((e,i)=>{
+    hs.slice(0,10).forEach((e,i)=>{
       cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.5)';
       cx.font=(i<3?'bold ':'')+'10px Share Tech Mono, monospace';
       cx.fillText((i+1)+'. '+e.name+' '+e.score,lx+pw/2,y+28+i*17);
@@ -255,7 +258,7 @@ function drawHighscoreList(x,y){
     cx.fillStyle='rgba(255,255,255,.3)';cx.font='10px Share Tech Mono, monospace';
     cx.fillText('Loading...',rx+pw/2,y+34);
   } else {
-    gs.slice(0,5).forEach((e,i)=>{
+    gs.slice(0,10).forEach((e,i)=>{
       cx.fillStyle=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'rgba(255,255,255,.5)';
       cx.font=(i<3?'bold ':'')+'10px Share Tech Mono, monospace';
       cx.fillText((i+1)+'. '+e.name+' '+e.score,rx+pw/2,y+28+i*17);
