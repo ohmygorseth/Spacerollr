@@ -119,6 +119,7 @@ cv.addEventListener('wheel',(e)=>{
     }
   }
 },{passive:false});
+
 cv.addEventListener('mousedown',(e)=>{if(state==='play'&&e.button===0){jvy=CONFIG.JUMP_VY;playJump();}});
 
 function handleClick(e){
