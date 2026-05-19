@@ -113,8 +113,8 @@ cv.addEventListener('click',(e)=>{handleClick(e);});
 cv.addEventListener('wheel',(e)=>{
   if(state==='start'||state==='dead'||state==='levelcomplete'){
     const gs=getGlobalScores();
-    if(gs.length>10){
-      worldScrollY=Math.max(0,Math.min(worldScrollY+e.deltaY,(gs.length-10)*17));
+    if(gs.length>6){
+      worldScrollY=Math.max(0,Math.min(worldScrollY+e.deltaY*0.5,(gs.length-6)*16));
       e.preventDefault();
     }
   }
@@ -241,7 +241,7 @@ function getGlobalScores(){
 }
 function drawHighscoreList(x,y){
   const hs=loadHS();
-  const pw=140,ph=Math.floor(H*0.52),gap=8;
+  const pw=140,ph=160,gap=8;
   const lx=x-pw-gap/2,rx=x+gap/2;
 
   // YOU panel
@@ -429,8 +429,7 @@ function drawStartScreen(){
   cx.fillText('SELECT MODE',cx0,py2+14);
   drawNeonBtn(px2+10,py2+22,115,36,'MAIN MODE','#00ffff');
   drawNeonBtn(px2+135,py2+22,115,36,'SELECT LEVEL','#aa00ff');
-  const hpy=py2+ph+10;
-  drawHighscoreList(cx0,hpy);
+  drawHighscoreList(cx0,py2+90+6);
   cx.textAlign='left';
 }
 
