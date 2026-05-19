@@ -241,7 +241,7 @@ function getGlobalScores(){
 }
 function drawHighscoreList(x,y){
   const hs=loadHS();
-  const pw=130,ph=200,gap=10;
+  const pw=140,ph=Math.floor(H*0.52),gap=8;
   const lx=x-pw-gap/2,rx=x+gap/2;
 
   // YOU panel
@@ -423,7 +423,7 @@ function drawStartScreen(){
   cx.textAlign='center';
   cx.fillStyle='rgba(255,255,255,.25)';cx.font='10px Share Tech Mono, monospace';
   cx.fillText('← → / A D MOVE   |   SPACE / CLICK JUMP',cx0,H*0.22+20);
-  const pw=260,ph=110,px2=cx0-pw/2,py2=H*0.33;
+  const pw=260,ph=90,px2=cx0-pw/2,py2=H*0.28;
   drawPanel(px2,py2,pw,ph,'#aa00ff');
   cx.textAlign='center';cx.fillStyle='rgba(170,0,255,.5)';cx.font='9px Share Tech Mono, monospace';
   cx.fillText('SELECT MODE',cx0,py2+14);
