@@ -135,16 +135,15 @@ function handleClick(e){
       if(mx>px2+10&&mx<px2+10+btnW&&my>py2&&my<py2+btnH){startMainMode();}
       else if(mx>px2+135&&mx<px2+135+btnW&&my>py2&&my<py2+btnH){menuState='levelselect';}
     } else if(menuState==='levelselect'){
-      // Match drawLevelSelect: pw=300, py2=H*0.33, bx/by coords
-      const cx0=W/2,py2=H*0.33,ph=150;
-      const p=loadProgress();
+      const cx0=W/2,py2=H*0.33,ph=130;
+      const n=LEVELS.length,bw=56,bh=52,gap=10;
+      const totalW=n*bw+(n-1)*gap;
+      const startX=cx0-totalW/2;
       LEVELS.forEach((_,i)=>{
-        const bx=cx0-((LEVELS.length*80)/2)+(i*80)+5,by=py2+28,bw=70,bh=50;
-        if(mx>bx&&mx<bx+bw&&my>by&&my<by+bh){
-          startLevel(i);
-        }
+        const bx=startX+i*(bw+gap),by=py2+26;
+        if(mx>bx&&mx<bx+bw&&my>by&&my<by+bh){startLevel(i);}
       });
-      if(mx>cx0-55&&mx<cx0+55&&my>py2+ph-42&&my<py2+ph-12){menuState='main';}
+      if(mx>cx0-50&&mx<cx0+50&&my>py2+ph-38&&my<py2+ph-10){menuState='main';}
     }
   }
 }
