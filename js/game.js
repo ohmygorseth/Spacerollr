@@ -127,12 +127,8 @@ function handleClick(e){
   if(state==='levelcomplete'){state='start';menuState='main';return;}
   if(state==='start'){
     const rect=cv.getBoundingClientRect();
-    // Account for object-fit:contain letterboxing
-    const scale=Math.min(rect.width/W,rect.height/H);
-    const offsetX=(rect.width-W*scale)/2;
-    const offsetY=(rect.height-H*scale)/2;
-    const mx=(e.clientX-rect.left-offsetX)/scale;
-    const my=(e.clientY-rect.top-offsetY)/scale;
+    const mx=(e.clientX-rect.left)*(W/rect.width);
+    const my=(e.clientY-rect.top)*(H/rect.height);
     if(menuState==='main'){
       // Match drawStartScreen: pw=260, buttons at py2=H*0.33+22, h=36
       const px2=W/2-130,py2=H*0.33+22,btnW=115,btnH=36;
