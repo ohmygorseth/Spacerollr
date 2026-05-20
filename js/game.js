@@ -139,8 +139,10 @@ function handleClick(e){
       const n=LEVELS.length,bw=56,bh=52,gap=10;
       const totalW=n*bw+(n-1)*gap;
       const startX=cx0-totalW/2;
+      console.log('mx='+mx.toFixed(0)+' startX='+startX.toFixed(0)+' bw='+bw+' gap='+gap);
       LEVELS.forEach((_,i)=>{
         const bx=startX+i*(bw+gap),by=py2+26;
+        console.log('L'+(i+1)+': bx='+bx.toFixed(0)+'-'+(bx+bw).toFixed(0));
         if(mx>bx&&mx<bx+bw&&my>by&&my<by+bh){startLevel(i);}
       });
       if(mx>cx0-50&&mx<cx0+50&&my>py2+ph-38&&my<py2+ph-10){menuState='main';}
