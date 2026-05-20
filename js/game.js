@@ -5,7 +5,6 @@ document.head.appendChild(_fontLink);
 const cv=document.getElementById('c'),cx=cv.getContext('2d');
 const DPR=window.devicePixelRatio||1;
 cv.width=CONFIG.WIDTH*DPR;cv.height=CONFIG.HEIGHT*DPR;
-cx.scale(DPR,DPR);
 const W=CONFIG.WIDTH,H=CONFIG.HEIGHT;
 const{HORIZON_Y:HY,FOCAL,TRACK_COLS:COLS,TRACK_HW:THW,VIEW_DIST:VIEW,PLAYER_Z:PZ,BALL_RADIUS:BR,TILE_COLORS:EC}=CONFIG;
 function pr(d){d=Math.max(d,0.05);const s=FOCAL/d;return{y:HY+(H-HY)*s,hw:W*0.46*s,s};}
@@ -562,6 +561,7 @@ resizeCanvas();
 state='start';reset();state='start';
 function loop(t){
   try{
+    cx.setTransform(DPR,0,0,DPR,0,0);
     update(t);
     if(state==='start'){
       if(menuState==='main')drawStartScreen();
