@@ -552,8 +552,8 @@ function resizeCanvas(){
   const scaleX=window.innerWidth/W;
   const scaleY=window.innerHeight/H;
   const scale=Math.min(scaleX,scaleY);
-  cv.style.width=Math.floor(W*scale)+'px';
-  cv.style.height=Math.floor(H*scale)+'px';
+  cv.style.width=Math.round(W*scale)+'px';
+  cv.style.height=Math.round(H*scale)+'px';
 }
 window.addEventListener('resize',resizeCanvas);
 resizeCanvas();
