@@ -127,8 +127,12 @@ function handleClick(e){
   if(state==='levelcomplete'){state='start';menuState='main';return;}
   if(state==='start'){
     const rect=cv.getBoundingClientRect();
-    const mx=(e.clientX-rect.left)*(W/rect.width);
-    const my=(e.clientY-rect.top)*(H/rect.height);
+    // Account for object-fit:contain letterboxing
+    const scale=Math.min(rect.width/W,rect.height/H);
+    const offsetX=(rect.width-W*scale)/2;
+    const offsetY=(rect.height-H*scale)/2;
+    const mx=(e.clientX-rect.left-offsetX)/scale;
+    const my=(e.clientY-rect.top-offsetY)/scale;
     if(menuState==='main'){
       // Match drawStartScreen: pw=260, buttons at py2=H*0.33+22, h=36
       const px2=W/2-130,py2=H*0.33+22,btnW=115,btnH=36;
@@ -139,10 +143,8 @@ function handleClick(e){
       const n=LEVELS.length,bw=56,bh=52,gap=10;
       const totalW=n*bw+(n-1)*gap;
       const startX=cx0-totalW/2;
-      console.log('mx='+mx.toFixed(0)+' startX='+startX.toFixed(0)+' bw='+bw+' gap='+gap);
       LEVELS.forEach((_,i)=>{
         const bx=startX+i*(bw+gap),by=py2+26;
-        console.log('L'+(i+1)+': bx='+bx.toFixed(0)+'-'+(bx+bw).toFixed(0));
         if(mx>bx&&mx<bx+bw&&my>by&&my<by+bh){startLevel(i);}
       });
       if(mx>cx0-50&&mx<cx0+50&&my>py2+ph-38&&my<py2+ph-10){menuState='main';}
