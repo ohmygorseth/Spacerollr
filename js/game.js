@@ -547,6 +547,16 @@ function playMusic(level){
 function stopMusic(){
   if(musicEl){musicEl.pause();musicEl.currentTime=0;currentTrack=-1;}
 }
+
+function resizeCanvas(){
+  const scaleX=window.innerWidth/W;
+  const scaleY=window.innerHeight/H;
+  const scale=Math.min(scaleX,scaleY);
+  cv.style.width=Math.floor(W*scale)+'px';
+  cv.style.height=Math.floor(H*scale)+'px';
+}
+window.addEventListener('resize',resizeCanvas);
+resizeCanvas();
 state='start';reset();state='start';
 function loop(t){
   try{
