@@ -131,7 +131,7 @@ function handleClick(e){
     const my=(e.clientY-rect.top)*(H/rect.height);
     if(menuState==='main'){
       // Match drawStartScreen: pw=260, buttons at py2=H*0.33+22, h=36
-      const px2=W/2-130,py2=H*0.33+22,btnW=115,btnH=36;
+      const px2=W/2-130,py2=H*0.28+22,btnW=115,btnH=36;
       if(mx>px2+10&&mx<px2+10+btnW&&my>py2&&my<py2+btnH){startMainMode();}
       else if(mx>px2+135&&mx<px2+135+btnW&&my>py2&&my<py2+btnH){menuState='levelselect';}
     } else if(menuState==='levelselect'){
