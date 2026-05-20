@@ -136,7 +136,7 @@ function handleClick(e){
       else if(mx>px2+135&&mx<px2+135+btnW&&my>py2&&my<py2+btnH){menuState='levelselect';}
     } else if(menuState==='levelselect'){
       const cx0=W/2,py2=H*0.33,ph=130;
-      const n=LEVELS.length,bw=56,bh=52,gap=10;
+      const n=LEVELS.length,bw=60,bh=54,gap=8;
       const totalW=n*bw+(n-1)*gap;
       const startX=cx0-totalW/2;
       LEVELS.forEach((_,i)=>{
@@ -430,7 +430,7 @@ function drawLevelSelect(){
   drawSpaceBg();
   drawSpaceRollrLogo(cx0,H*0.22);
   const n=LEVELS.length;
-  const bw=56,bh=52,gap=10;
+  const bw=60,bh=54,gap=8;
   const totalW=n*bw+(n-1)*gap;
   const pw=totalW+40,ph=130,px2=cx0-pw/2,py2=H*0.33;
   drawPanel(px2,py2,pw,ph,'#aa00ff');
