@@ -12,7 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-app-compat.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-database-compat.min.js"></script>
   <script>
-    const firebaseConfig = {
+    firebase.initializeApp({
       apiKey: "AIzaSyBM5Ory6ZSESYsL68u7HGGVATQpT5mB3GQ",
       authDomain: "space-rollr.firebaseapp.com",
       databaseURL: "https://space-rollr-default-rtdb.europe-west1.firebasedatabase.app",
@@ -20,32 +20,22 @@
       storageBucket: "space-rollr.firebasestorage.app",
       messagingSenderId: "546982544672",
       appId: "1:546982544672:web:e06512218c64128fa38345"
-    };
-
-    firebase.initializeApp(firebaseConfig);
+    });
     const db = firebase.database();
-
     window.fbSubmitScore = function(name, score) {
       return db.ref('scores').push({ name: name, score: score, ts: Date.now() });
     };
-
-    // Realtime listener - updates globalScores automatically
     db.ref('scores').on('value', function(snap) {
       var scores = [];
       snap.forEach(function(child) { scores.push(child.val()); });
       window.globalScoresCache = scores.sort(function(a,b) { return b.score - a.score; }).slice(0,100);
     });
-
     window.fbGetScores = function() {
       return Promise.resolve(window.globalScoresCache || []);
     };
   </script>
 
   <script src="js/config.js"></script>
-  <script src="js/level1.js"></script>
-  <script src="js/level2.js"></script>
-  <script src="js/level3.js"></script>
-  <script src="js/level4.js"></script>
   <script src="js/levels.js"></script>
   <script src="js/game.js"></script>
 </body>
