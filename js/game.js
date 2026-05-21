@@ -10,7 +10,7 @@ function currentLevelData(){return LEVELS[currentLevel];}
 let track=[],tBase=0;
 function mkRow(z){
   const i=Math.floor(z);
-  if(i>=currentLevelData().length){return{c:[1,1,1,1],e:'n'};}
+  if(i>=currentLevelData().length){return null;}
   const lvl=currentLevelData();return{c:lvl[Math.min(i,lvl.length-1)].slice(),e:'n'};
 }
 function getRow(wz){const i=Math.floor(wz)-tBase;return(i>=0&&i<track.length)?track[i]:null;}
@@ -142,7 +142,7 @@ const colR=Math.max(0,Math.min(COLS-1,Math.floor(px+THW+ballW)));
 const solidL=row&&row.c[colL];
 const solidR=row&&row.c[colR];
 const solid=solidL||solidR;
-if(jy>=0&&!solid){die();return;}if(solid&&jy>=0&&Math.abs(pvx)>1.5&&Math.random()<.15)spawnSpark();for(const p of pts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt;}pts=pts.filter(p=>p.life>0);growTrack(camZ);if(camZ+PZ>=currentLevelData().length){camZ=0;scoreOffset=0;score=0;}}
+if(jy>=0&&!solid){die();return;}if(solid&&jy>=0&&Math.abs(pvx)>1.5&&Math.random()<.15)spawnSpark();for(const p of pts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt;}pts=pts.filter(p=>p.life>0);growTrack(camZ);if(camZ+PZ>=currentLevelData().length){scoreOffset+=camZ;camZ=0;track=[];tBase=0;growTrack(0);}}
 function spawnSpark(){const p=pr(PZ),bx=W/2+(px/THW)*p.hw;for(let i=0;i<3;i++)pts.push({x:bx,y:p.y,vx:(Math.random()-.5)*100,vy:-50-Math.random()*60,life:.35,col:['#ff00ff','#00ffff','#aa00ff'][Math.floor(Math.random()*3)]});}
 
 const STARS=[];
