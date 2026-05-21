@@ -1827,3 +1827,5 @@ const LEVEL1=[
   [0,1,1,0],
   [1,1,1,1]
 ];
+
+const LEVELS = [LEVEL1];
