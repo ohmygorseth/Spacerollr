@@ -235,9 +235,9 @@ function getGlobalScores(){
 function drawHighscoreList(x,y){
   const hs=loadHS();
   const gs=getGlobalScores();
-  const pw=140,ph=160,gap=8;
+  const pw=200,ph=280,gap=12;
   const lx=x-pw-gap/2,rx=x+gap/2;
-  const rowH=16;
+  const rowH=22;
 
   // YOU panel
   drawPanel(lx,y,pw,ph,'#00ffff');
