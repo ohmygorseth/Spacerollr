@@ -37,7 +37,7 @@ function die(){
   fetchGlobalScores();
 }
 function go(){if(gameMode==='select'){scoreOffset=999;playMusic();reset();}else{currentLevel=0;scoreOffset=0;levelDisplay=1;playMusic();reset();}}
-function startMainMode(){AC.resume();playMusic();gameMode='main';currentLevel=0;scoreOffset=0;levelDisplay=1;menuState='main';reset();}
+function startMainMode(){AC.resume();playMusic();gameMode='main';currentLevel=0;scoreOffset=0;levelDisplay=1;menuState='play';reset();}
 function startLevel(n){AC.resume();playMusic(n);gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
 function nextLevel(){
   completeLevel(currentLevel);
@@ -128,7 +128,6 @@ function handleClick(e){
     const mx=(e.clientX-rect.left)*(W/rect.width);
     const my=(e.clientY-rect.top)*(H/rect.height);
     if(menuState==='main'){
-      console.log('click mx='+mx.toFixed(0)+' my='+my.toFixed(0)+' btn='+(W/2-70).toFixed(0)+'-'+(W/2+70).toFixed(0)+' y='+(H*0.28+20).toFixed(0)+'-'+(H*0.28+62).toFixed(0));
       const py2=H*0.28+20,btnH=42;
       if(mx>W/2-70&&mx<W/2+70&&my>py2&&my<py2+btnH){startMainMode();}
     }
@@ -557,7 +556,7 @@ function loop(t){
       if(menuState==='main')drawStartScreen();
       else if(menuState==='levelselect')drawLevelSelect();
     } else {
-      drawBg();drawTrack();drawFinishLine();drawParticles();drawBall();drawHUD();
+      drawBg();drawTrack();drawParticles();drawBall();drawHUD();
       if(state==='dead')drawOverlay('GAME OVER',gameMode==='select'?'':'Score: '+score,'');
 
       if(state==='levelcomplete')drawLevelComplete();
