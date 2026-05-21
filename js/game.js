@@ -321,7 +321,7 @@ function drawNeonBtn(x,y,w,h,label,color){
 }
 function drawSpaceRollrLogo(cx0,y){
   const letters=[{l:'S',c:'#ff00ff'},{l:'P',c:'#cc00ff'},{l:'A',c:'#00ffff'},{l:'C',c:'#ff00ff'},{l:'E',c:'#aa00ff'},{l:' ',c:'#fff'},{l:'R',c:'#00ffff'},{l:'O',c:'#ff0099'},{l:'L',c:'#ff00ff'},{l:'L',c:'#cc00ff'},{l:'R',c:'#00ffff'}];
-  const fontSize=44,letterW=32,totalW=letters.length*letterW;
+  const fontSize=72,letterW=52,totalW=letters.length*letterW;
   const startX=cx0-totalW/2;
   cx.font='bold '+fontSize+'px Orbitron, monospace';cx.textAlign='left';
   letters.forEach(function(lt,i){
