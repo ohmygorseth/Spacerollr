@@ -129,8 +129,8 @@ function handleClick(e){
     const my=(e.clientY-rect.top)*(H/rect.height);
     if(menuState==='main'){
       // Match drawStartScreen: pw=260, buttons at py2=H*0.33+22, h=36
-      const px2=W/2-130,py2=H*0.28+22,btnW=120,btnH=36;
-      if(mx>px2+pw/2-60&&mx<px2+pw/2+60&&my>py2&&my<py2+btnH){startMainMode();}
+      const py2=H*0.28+20,btnH=42;
+      if(mx>W/2-70&&mx<W/2+70&&my>py2&&my<py2+btnH){startMainMode();}
     }
   }
 }
@@ -453,10 +453,7 @@ function drawStartScreen(){
   cx.fillStyle='rgba(255,255,255,.25)';cx.font='10px Share Tech Mono, monospace';
   cx.fillText('← → MOVE   |   SPACE JUMP',cx0,H*0.22+20);
   const pw=260,ph=90,px2=cx0-pw/2,py2=H*0.28;
-  drawPanel(px2,py2,pw,ph,'#aa00ff');
-  cx.textAlign='center';cx.fillStyle='rgba(170,0,255,.5)';cx.font='9px Share Tech Mono, monospace';
-  cx.fillText('SELECT MODE',cx0,py2+14);
-  drawNeonBtn(px2+pw/2-60,py2+22,120,36,'MAIN MODE','#00ffff');
+  drawNeonBtn(cx0-70,py2+20,140,42,'▶  PLAY GAME','#00ffff');
   drawHighscoreList(cx0,py2+90+6);
   cx.textAlign='left';
 }
