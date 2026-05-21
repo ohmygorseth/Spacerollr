@@ -37,12 +37,14 @@ function die(){
   fetchGlobalScores();
 }
 function go(){if(gameMode==='select'){scoreOffset=999;playMusic(currentLevel);reset();}else{currentLevel=0;scoreOffset=0;playMusic(0);reset();}}
-function startMainMode(){AC.resume();playMusic(0);gameMode='main';currentLevel=0;scoreOffset=0;menuState='main';reset();}
+function startMainMode(){AC.resume();playMusic(0);gameMode='main';currentLevel=0;scoreOffset=0;levelDisplay=1;menuState='main';reset();}
 function startLevel(n){AC.resume();playMusic(n);gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
 function nextLevel(){
   completeLevel(currentLevel);
-  if(gameMode==='main'&&currentLevel+1<LEVELS.length){
-    scoreOffset+=camZ;currentLevel++;camZ=0;px=0;pvx=0;jy=0;jvy=0;pts=[];rot=0;track=[];tBase=0;state='play';playMusic(currentLevel);growTrack(0);
+  if(gameMode==='main'){
+    scoreOffset+=camZ;levelDisplay++;
+    currentLevel=(currentLevel+1)%LEVELS.length;
+    camZ=0;px=0;pvx=0;jy=0;jvy=0;pts=[];rot=0;track=[];tBase=0;state='play';playMusic(currentLevel);growTrack(0);
   } else {
     completeLevel(currentLevel);
     if(score>hi)hi=score;
@@ -198,15 +200,6 @@ function drawTrack(){
       // Bakre kant
       cx.lineWidth=0.6;
       cx.beginPath();cx.moveTo(x1b,pB.y);cx.lineTo(x2b,pB.y);cx.stroke();
-      // Ball glow
-      const ballCol=Math.max(0,Math.min(COLS-1,Math.floor(px+THW)));
-      if(c===ballCol&&jy>=0&&i<=2){
-        cx.globalAlpha=0.3;
-        cx.fillStyle='rgba(255,255,255,1)';
-        cx.beginPath();cx.moveTo(x1f,pF.y);cx.lineTo(x2f,pF.y);cx.lineTo(x2b,pB.y);cx.lineTo(x1b,pB.y);cx.closePath();
-        cx.fill();
-        cx.globalAlpha=1;
-      }
       }
   }
 }
@@ -240,13 +233,13 @@ function drawFinishLine(){
     cx.textAlign='center';
     cx.fillStyle='rgba(255,215,0,'+(1-dist/12)+')';
     cx.font='bold 16px Share Tech Mono, monospace';
-    cx.fillText('🏁 END OF LEVEL '+(currentLevel+1), W/2, p.y - 12);
+    cx.fillText('🏁 END OF LEVEL '+levelDisplay, W/2, p.y - 12);
     cx.textAlign='left';
   }
 }
 function drawBall(){const p=pr(PZ),bx=W/2+(px/THW)*p.hw,gY=p.y-BR,by=gY+jy;cx.beginPath();cx.ellipse(bx,gY+3,BR*.75,BR*.2,0,0,Math.PI*2);cx.fillStyle='rgba(0,0,0,'+Math.max(0,.4+jy*.003)+')';cx.fill();cx.save();cx.translate(bx,by);cx.rotate(rot);const g=cx.createRadialGradient(-BR*.3,-BR*.35,BR*.05,0,0,BR);g.addColorStop(0,'#aaf5f0');g.addColorStop(.4,'#00c8c0');g.addColorStop(1,'#006f6a');cx.beginPath();cx.arc(0,0,BR,0,Math.PI*2);cx.fillStyle=g;cx.fill();cx.beginPath();cx.arc(-BR*.28,-BR*.32,BR*.2,0,Math.PI*2);cx.fillStyle='rgba(255,255,255,.45)';cx.fill();cx.restore();}
 function drawParticles(){for(const p of pts){cx.beginPath();cx.arc(p.x,p.y,Math.max(1,3*p.life),0,Math.PI*2);cx.fillStyle=p.col+(Math.min(255,(p.life*2*255)|0).toString(16).padStart(2,'0'));cx.fill();}}
-function drawHUD(){if(gameMode==='select')return;cx.textAlign='left';cx.fillStyle='#fff';cx.font='bold 17px Share Tech Mono, monospace';cx.fillText('SCORE '+score,10,24);if(hi){cx.fillStyle='rgba(255,255,255,.4)';cx.font='11px Share Tech Mono, monospace';cx.fillText('BEST '+hi,10,39);}cx.textAlign='left';}
+function drawHUD(){if(gameMode==='select')return;cx.textAlign='left';cx.fillStyle='#fff';cx.font='bold 17px Share Tech Mono, monospace';cx.fillText('SCORE '+score,10,24);if(hi){cx.fillStyle='rgba(255,255,255,.4)';cx.font='11px Share Tech Mono, monospace';cx.fillText('BEST '+hi,10,39);}cx.fillStyle='rgba(255,255,255,.4)';cx.font='11px Share Tech Mono, monospace';cx.fillText('LEVEL '+levelDisplay,10,54);cx.textAlign='left';}
 
 function getGlobalScores(){
   return window.globalScoresCache||globalScores||[];
