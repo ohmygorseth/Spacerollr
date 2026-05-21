@@ -550,6 +550,7 @@ window.addEventListener('resize',resizeCanvas);
 resizeCanvas();
 state='start';reset();state='start';
 function loop(t){
+  requestAnimationFrame(loop);
   try{
     update(t);
     if(state==='start'){
