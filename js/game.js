@@ -36,7 +36,7 @@ function die(){
   else{state='dead';}
   fetchGlobalScores();
 }
-function go(){if(gameMode==='select'){scoreOffset=999;playMusic(currentLevel);reset();}else{currentLevel=0;scoreOffset=0;playMusic(0);reset();}}
+function go(){if(gameMode==='select'){scoreOffset=999;playMusic(currentLevel);reset();}else{currentLevel=0;scoreOffset=0;levelDisplay=1;playMusic(0);reset();}}
 function startMainMode(){AC.resume();playMusic(0);gameMode='main';currentLevel=0;scoreOffset=0;levelDisplay=1;menuState='main';reset();}
 function startLevel(n){AC.resume();playMusic(n);gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
 function nextLevel(){
