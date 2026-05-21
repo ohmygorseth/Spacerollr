@@ -128,7 +128,7 @@ function handleClick(e){
     const mx=(e.clientX-rect.left)*(W/rect.width);
     const my=(e.clientY-rect.top)*(H/rect.height);
     if(menuState==='main'){
-      // Match drawStartScreen: pw=260, buttons at py2=H*0.33+22, h=36
+      console.log('click mx='+mx.toFixed(0)+' my='+my.toFixed(0)+' btn='+(W/2-70).toFixed(0)+'-'+(W/2+70).toFixed(0)+' y='+(H*0.28+20).toFixed(0)+'-'+(H*0.28+62).toFixed(0));
       const py2=H*0.28+20,btnH=42;
       if(mx>W/2-70&&mx<W/2+70&&my>py2&&my<py2+btnH){startMainMode();}
     }
