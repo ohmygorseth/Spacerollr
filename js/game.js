@@ -449,8 +449,12 @@ function drawStartScreen(){
   drawSpaceBg();
   drawSpaceRollrLogo(cx0,H*0.22);
   cx.textAlign='center';
-  cx.fillStyle='rgba(255,255,255,.25)';cx.font='10px Share Tech Mono, monospace';
-  cx.fillText('← → MOVE   |   SPACE JUMP',cx0,H*0.22+20);
+  // Controls text - styled
+  const ctrlY=H*0.22+36;
+  cx.font='bold 18px Share Tech Mono, monospace';
+  cx.fillStyle='#00ffff';cx.fillText('← →  TO MOVE',cx0-120,ctrlY);
+  cx.fillStyle='rgba(255,255,255,0.4)';cx.fillText('|',cx0,ctrlY);
+  cx.fillStyle='#aa00ff';cx.fillText('SPACE TO JUMP',cx0+110,ctrlY);
   const pw=260,ph=90,px2=cx0-pw/2,py2=H*0.28;
   drawNeonBtn(cx0-110,py2+20,220,56,'▶  PLAY GAME','#00ffff');
   drawHighscoreList(cx0,py2+90+6);
