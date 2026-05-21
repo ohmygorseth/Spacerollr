@@ -198,6 +198,15 @@ function drawTrack(){
       // Bakre kant
       cx.lineWidth=0.6;
       cx.beginPath();cx.moveTo(x1b,pB.y);cx.lineTo(x2b,pB.y);cx.stroke();
+      // Ball glow
+      const ballCol=Math.max(0,Math.min(COLS-1,Math.floor(px+THW)));
+      if(c===ballCol&&jy>=0&&i<=2){
+        cx.globalAlpha=0.3;
+        cx.fillStyle='rgba(255,255,255,1)';
+        cx.beginPath();cx.moveTo(x1f,pF.y);cx.lineTo(x2f,pF.y);cx.lineTo(x2b,pB.y);cx.lineTo(x1b,pB.y);cx.closePath();
+        cx.fill();
+        cx.globalAlpha=1;
+      }
       }
   }
 }
