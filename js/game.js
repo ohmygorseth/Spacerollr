@@ -37,6 +37,7 @@ function die(){
   fetchGlobalScores();
 }
 function go(){if(gameMode==='select'){scoreOffset=999;playMusic();reset();}else{currentLevel=0;scoreOffset=0;levelDisplay=1;playMusic();reset();}}
+function startTestMode(){AC.resume();playMusic();gameMode='test';currentLevel=0;scoreOffset=0;levelDisplay=1;loopCount=0;speedNotif=0;lastSpeedLevel=0;menuState='play';reset();}
 function startMainMode(){AC.resume();playMusic();gameMode='main';currentLevel=0;scoreOffset=0;levelDisplay=1;loopCount=0;speedNotif=0;lastSpeedLevel=0;menuState='play';reset();}
 function startLevel(n){AC.resume();playMusic(n);gameMode='select';currentLevel=n;scoreOffset=999;menuState='play';reset();}
 function nextLevel(){
@@ -163,6 +164,7 @@ function handleClick(e){
     if(menuState==='main'){
       const py2=H*0.28+20,btnH=56;
       if(mx>W/2-110&&mx<W/2+110&&my>py2&&my<py2+btnH){startMainMode();}
+      if(typeof TEST_LEVEL!=='undefined'&&mx>W/2+130&&mx<W/2+250&&my>py2&&my<py2+btnH){startTestMode();}
     }
   }
 }
@@ -271,27 +273,15 @@ function drawHUD(){
   cx.fillText('SCORE '+score,10,24);
   if(hi){cx.fillStyle='rgba(255,255,255,.4)';cx.font='11px Share Tech Mono, monospace';cx.fillText('BEST '+hi,10,39);}
 
-  // Speed bar
-  const barW=120,barH=8,barX=10,barY=H-20;
+  // Speed bar - top left
+  const barW=180,barH=14,barX=10,barY=50;
   const speedPct=Math.min(1,(spd-CONFIG.BASE_SPEED)/(CONFIG.MAX_SPEED*2-CONFIG.BASE_SPEED));
-  cx.fillStyle='rgba(255,255,255,.15)';cx.fillRect(barX,barY,barW,barH);
+  cx.fillStyle='rgba(255,255,255,.12)';cx.fillRect(barX,barY,barW,barH);
   const sc=cx.createLinearGradient(barX,0,barX+barW,0);
   sc.addColorStop(0,'#00ffff');sc.addColorStop(0.6,'#aa00ff');sc.addColorStop(1,'#ff0066');
   cx.fillStyle=sc;cx.fillRect(barX,barY,barW*speedPct,barH);
-  cx.fillStyle='rgba(255,255,255,.5)';cx.font='10px Share Tech Mono, monospace';
+  cx.fillStyle='rgba(255,255,255,.6)';cx.font='bold 13px Share Tech Mono, monospace';
   cx.fillText('SPD '+spd.toFixed(1),barX,barY-4);
-
-  // Speed up notification
-  if(speedNotif>0){
-    const alpha=Math.min(1,speedNotif);
-    cx.globalAlpha=alpha;
-    cx.textAlign='center';
-    cx.font='bold 32px Share Tech Mono, monospace';
-    cx.fillStyle='#ff0066';
-    cx.shadowColor='#ff0066';cx.shadowBlur=20;
-    cx.fillText('SPEED UP!',W/2,H*0.45);
-    cx.shadowBlur=0;cx.globalAlpha=1;
-  }
   cx.textAlign='left';
 }
 
@@ -524,6 +514,7 @@ function drawStartScreen(){
   cx.fillStyle='#aa00ff';cx.fillText('SPACE TO JUMP',cx0+110,ctrlY);
   const pw=260,ph=90,px2=cx0-pw/2,py2=H*0.28;
   drawNeonBtn(cx0-110,py2+20,220,56,'▶  PLAY GAME','#00ffff');
+  if(typeof TEST_LEVEL!=='undefined')drawNeonBtn(cx0+130,py2+20,120,56,'TEST','#ff00ff');
   drawHighscoreList(cx0,py2+90+6);
   cx.textAlign='left';
 }
