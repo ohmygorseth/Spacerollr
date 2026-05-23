@@ -5,7 +5,7 @@ const{HORIZON_Y:HY,FOCAL,TRACK_COLS:COLS,TRACK_HW:THW,VIEW_DIST:VIEW,PLAYER_Z:PZ
 function pr(d){d=Math.max(d,0.05);const s=FOCAL/d;return{y:HY+(H-HY)*s,hw:W*0.46*s,s};}
 
 // Levels er definert i levels.js
-function currentLevelData(){return LEVELS[currentLevel];}
+function currentLevelData(){if(gameMode==='test'&&typeof TEST_LEVEL!=='undefined')return TEST_LEVEL;return LEVELS[currentLevel%LEVELS.length];}
 
 let track=[],tBase=0;
 function mkRow(z){
