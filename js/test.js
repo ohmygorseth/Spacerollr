@@ -1,5 +1,4 @@
 const TEST_LEVEL=[
-const LEVEL1=[
   [1,1,1,1],
   [1,1,1,1],
   [1,1,1,1],
