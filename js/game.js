@@ -108,11 +108,44 @@ document.addEventListener('keydown',e=>{
 });
 cv.addEventListener('click',(e)=>{handleClick(e);});
 
+
+// Scrollbar drag
+cv.addEventListener('mousedown',(e)=>{
+  if(state!=='start'&&state!=='dead'&&state!=='levelcomplete')return;
+  const gs=getGlobalScores();if(!gs.length)return;
+  const rect=cv.getBoundingClientRect();
+  const scale=Math.min(rect.width/W,rect.height/H);
+  const offsetX=(rect.width-W*scale)/2;
+  const offsetY=(rect.height-H*scale)/2;
+  const mx=(e.clientX-rect.left-offsetX)/scale;
+  const my=(e.clientY-rect.top-offsetY)/scale;
+  const pw=260,ph=360,gap=16,rx=W/2+gap/2;
+  const y=drawHighscoreY;
+  const sbX=rx+pw-7;
+  if(mx>=sbX-4&&mx<=sbX+9&&my>=y+20&&my<=y+ph-4){
+    scrollDragging=true;
+    scrollDragStartY=e.clientY;
+    scrollDragStartScroll=worldScrollY;
+    e.preventDefault();
+  }
+});
+document.addEventListener('mousemove',(e)=>{
+  if(!scrollDragging)return;
+  const gs=getGlobalScores();if(!gs.length)return;
+  const rowH=28,ph=360;
+  const trackH=ph-24;
+  const maxScroll=Math.max(0,(gs.length*rowH)-(ph-28));
+  const dy=(e.clientY-scrollDragStartY);
+  const rect=cv.getBoundingClientRect();
+  const scale=Math.min(rect.width/W,rect.height/H);
+  worldScrollY=Math.max(0,Math.min(scrollDragStartScroll+(dy/scale/trackH)*maxScroll,maxScroll));
+});
+document.addEventListener('mouseup',()=>{scrollDragging=false;});
 cv.addEventListener('wheel',(e)=>{
   if(state==='start'||state==='dead'||state==='levelcomplete'){
     const gs=getGlobalScores();
     if(gs.length>6){
-      worldScrollY=Math.max(0,Math.min(worldScrollY+e.deltaY*0.5,(gs.length-6)*16));
+      const maxSc=Math.max(0,(gs.length*rowH)-(ph-28));worldScrollY=Math.max(0,Math.min(worldScrollY+e.deltaY*0.5,maxSc));
       e.preventDefault();
     }
   }
@@ -233,7 +266,8 @@ function drawHUD(){if(gameMode==='select')return;cx.textAlign='left';cx.fillStyl
 function getGlobalScores(){
   return window.globalScoresCache||globalScores||[];
 }
-function drawHighscoreList(x,y){
+let drawHighscoreY=0;
+function drawHighscoreList(x,y){drawHighscoreY=y;
   const hs=loadHS();
   const gs=getGlobalScores();
   const pw=260,ph=360,gap=16;
@@ -273,7 +307,7 @@ function drawHighscoreList(x,y){
     cx.fillStyle='rgba(255,255,255,.3)';cx.font='10px Share Tech Mono, monospace';
     cx.fillText('Loading...',rx+pw/2,y+36);
   } else {
-    const maxScroll=Math.max(0,(gs.length*rowH)-(ph-24));
+    const maxScroll=Math.max(0,(gs.length*rowH)-(ph-28));
     worldScrollY=Math.min(worldScrollY,maxScroll);
     const startIdx=Math.floor(worldScrollY/rowH);
     const visCount=Math.ceil((ph-22)/rowH)+1;
@@ -463,7 +497,7 @@ function drawStartScreen(){
 }
 
 // ===== GLOBAL LEADERBOARD =====
-let globalScores=[],worldScrollY=0;
+let globalScores=[],worldScrollY=0,scrollDragging=false,scrollDragStartY=0,scrollDragStartScroll=0;
 async function fetchGlobalScores(){
   if(window.fbGetScores){
     try{
