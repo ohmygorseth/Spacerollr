@@ -269,19 +269,18 @@ function drawParticles(){for(const p of pts){cx.beginPath();cx.arc(p.x,p.y,Math.
 function drawHUD(){
   if(gameMode==='select')return;
   cx.textAlign='left';
-  cx.fillStyle='#fff';cx.font='bold 17px Share Tech Mono, monospace';
-  cx.fillText('SCORE '+score,10,24);
-  if(hi){cx.fillStyle='rgba(255,255,255,.4)';cx.font='11px Share Tech Mono, monospace';cx.fillText('BEST '+hi,10,39);}
+  cx.fillStyle='#fff';cx.font='bold 34px Share Tech Mono, monospace';
+  cx.fillText('SCORE '+score,10,38);
 
-  // Speed bar - top left
-  const barW=180,barH=14,barX=10,barY=50;
+  // Speed bar - top left, same size as score
+  const barW=280,barH=14,barX=10,barY=72;
   const speedPct=Math.min(1,(spd-CONFIG.BASE_SPEED)/(CONFIG.MAX_SPEED*2-CONFIG.BASE_SPEED));
   cx.fillStyle='rgba(255,255,255,.12)';cx.fillRect(barX,barY,barW,barH);
   const sc=cx.createLinearGradient(barX,0,barX+barW,0);
   sc.addColorStop(0,'#00ffff');sc.addColorStop(0.6,'#aa00ff');sc.addColorStop(1,'#ff0066');
   cx.fillStyle=sc;cx.fillRect(barX,barY,barW*speedPct,barH);
-  cx.fillStyle='rgba(255,255,255,.6)';cx.font='bold 13px Share Tech Mono, monospace';
-  cx.fillText('SPD '+spd.toFixed(1),barX,barY-4);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.font='bold 22px Share Tech Mono, monospace';
+  cx.fillText('SPD '+spd.toFixed(1),barX,barY-5);
   cx.textAlign='left';
 }
 
