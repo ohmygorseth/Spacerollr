@@ -171,8 +171,14 @@ function handleClick(e){
 function readGamepad(){const pads=navigator.getGamepads?navigator.getGamepads():[];for(const p of pads){if(p)return{left:p.axes[0]<-0.3||p.buttons[14]?.pressed,right:p.axes[0]>0.3||p.buttons[15]?.pressed,jump:p.buttons[0]?.pressed||p.buttons[1]?.pressed,start:p.buttons[9]?.pressed||p.buttons[8]?.pressed};}return{};}
 let prevT=0;
 function update(t){const gp=readGamepad();if(state!=='play'){if((state==='dead'||state==='start')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=(scoreOffset+Math.floor(camZ))*12|0;const tilesAfterFirstLoop=loopCount>0?(scoreOffset+Math.floor(camZ)-currentLevelData().length):0;
-const growthBoost=loopCount>0?Math.pow(1.25,Math.floor(tilesAfterFirstLoop/500)):1;
-spd=Math.min(CONFIG.BASE_SPEED+(scoreOffset+camZ)*CONFIG.SPEED_GROWTH*growthBoost,CONFIG.MAX_SPEED*growthBoost);
+let targetSpeed;
+if(loopCount>0){
+  const speedBoost=Math.min(25,CONFIG.MAX_SPEED+Math.floor(tilesAfterFirstLoop/20));
+  targetSpeed=speedBoost;
+} else {
+  targetSpeed=CONFIG.MAX_SPEED;
+}
+spd=Math.min(CONFIG.BASE_SPEED+(scoreOffset+camZ)*CONFIG.SPEED_GROWTH,targetSpeed);
 const curSpeedLevel=Math.floor(spd);
 if(curSpeedLevel>lastSpeedLevel){lastSpeedLevel=curSpeedLevel;speedNotif=3;}
 if(speedNotif>0)speedNotif-=dt;const left=K['ArrowLeft']||tL||gp.left,right=K['ArrowRight']||tR||gp.right,jump=K[' ']||tJ||gp.jump;pvx+=((right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0)-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;playJump();jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ);
