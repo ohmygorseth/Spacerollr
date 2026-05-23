@@ -145,7 +145,7 @@ cv.addEventListener('wheel',(e)=>{
   if(state==='start'||state==='dead'||state==='levelcomplete'){
     const gs=getGlobalScores();
     if(gs.length>6){
-      const maxSc=Math.max(0,(gs.length*rowH)-(ph-28));worldScrollY=Math.max(0,Math.min(worldScrollY+e.deltaY*0.5,maxSc));
+      const maxSc=Math.max(0,(gs.length*28)-(360-28));worldScrollY=Math.max(0,Math.min(worldScrollY+e.deltaY*0.5,maxSc));
       e.preventDefault();
     }
   }
