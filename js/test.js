@@ -1,4 +1,4 @@
-const LEVEL1=[
+const TEST_LEVEL=[
   [1,1,1,1,1],
   [1,1,1,1,1],
   [1,1,1,1,1],
@@ -10000,5 +10000,3 @@ const LEVEL1=[
   [1,1,1,1,1],
   [1,1,1,1,1]
 ];
-
-const LEVELS = [LEVEL1];
