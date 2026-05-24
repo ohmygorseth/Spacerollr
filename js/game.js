@@ -171,7 +171,8 @@ function handleClick(e){
 function readGamepad(){const pads=navigator.getGamepads?navigator.getGamepads():[];for(const p of pads){if(p)return{left:p.axes[0]<-0.3||p.buttons[14]?.pressed,right:p.axes[0]>0.3||p.buttons[15]?.pressed,jump:p.buttons[0]?.pressed||p.buttons[1]?.pressed,start:p.buttons[9]?.pressed||p.buttons[8]?.pressed};}return{};}
 let prevT=0;
 function update(t){const gp=readGamepad();if(state!=='play'){if((state==='dead'||state==='start')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=(scoreOffset+Math.floor(camZ))*12|0;const totalTiles=scoreOffset+Math.floor(camZ);
-const tilesAfterLoop=Math.max(0,totalTiles-1827);
+const speedThreshold=gameMode==='test'?300:1827;
+const tilesAfterLoop=Math.max(0,totalTiles-speedThreshold);
 const targetSpeed=Math.min(25,CONFIG.MAX_SPEED+Math.floor(tilesAfterLoop/20));
 spd=Math.min(CONFIG.BASE_SPEED+totalTiles*CONFIG.SPEED_GROWTH,targetSpeed);
 const curSpeedLevel=Math.floor(spd);
