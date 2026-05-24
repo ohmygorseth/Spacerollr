@@ -176,9 +176,7 @@ if(gameMode==='test'){
   const baseSpd=Math.min(CONFIG.MAX_SPEED,CONFIG.BASE_SPEED+totalTiles*CONFIG.SPEED_GROWTH);
   spd=Math.min(25,baseSpd+Math.floor(tilesAfter/5));
 } else {
-  const tilesAfterLoop=Math.max(0,totalTiles-1827);
-  const targetSpeed=Math.min(25,CONFIG.MAX_SPEED+Math.floor(tilesAfterLoop/20));
-  spd=Math.min(CONFIG.BASE_SPEED+totalTiles*CONFIG.SPEED_GROWTH,targetSpeed);
+  spd=Math.min(CONFIG.BASE_SPEED+totalTiles*CONFIG.SPEED_GROWTH,CONFIG.MAX_SPEED);
 }
 const curSpeedLevel=Math.floor(spd);
 if(curSpeedLevel>lastSpeedLevel){lastSpeedLevel=curSpeedLevel;speedNotif=3;}
