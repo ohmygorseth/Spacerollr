@@ -173,7 +173,8 @@ let prevT=0;
 function update(t){const gp=readGamepad();if(state!=='play'){if((state==='dead'||state==='start')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=(scoreOffset+Math.floor(camZ))*12|0;const totalTiles=scoreOffset+Math.floor(camZ);
 if(gameMode==='test'){
   const tilesAfter=Math.max(0,totalTiles-100);
-  spd=Math.min(25,CONFIG.BASE_SPEED+Math.floor(tilesAfter/5));
+  const baseSpd=Math.min(CONFIG.MAX_SPEED,CONFIG.BASE_SPEED+totalTiles*CONFIG.SPEED_GROWTH);
+  spd=Math.min(25,baseSpd+Math.floor(tilesAfter/5));
 } else {
   const tilesAfterLoop=Math.max(0,totalTiles-1827);
   const targetSpeed=Math.min(25,CONFIG.MAX_SPEED+Math.floor(tilesAfterLoop/20));
