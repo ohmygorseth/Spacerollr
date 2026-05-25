@@ -154,7 +154,7 @@ cv.addEventListener('wheel',(e)=>{
 
 
 
-function handleClick(e){
+function handleClick(e){if(!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
   if(state==='dead'){go();return;}
   if(state==='levelcomplete'){state='start';menuState='main';return;}
   if(state==='start'){
