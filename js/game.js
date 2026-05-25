@@ -544,12 +544,20 @@ function drawStartScreen(){
   drawSpaceBg();
   drawSpaceRollrLogo(cx0,H*0.22);
   cx.textAlign='center';
-  // Controls text - styled
-  const ctrlY=H*0.22+36;
-  cx.font='bold 18px Share Tech Mono, monospace';
-  cx.fillStyle='#00ffff';cx.fillText('← →  TO MOVE',cx0-120,ctrlY);
-  cx.fillStyle='rgba(255,255,255,0.4)';cx.fillText('|',cx0,ctrlY);
-  cx.fillStyle='#aa00ff';cx.fillText('SPACE TO JUMP',cx0+110,ctrlY);
+  cx.font='bold 16px Share Tech Mono, monospace';
+  const ctrlY1=H*0.22+30,ctrlY2=H*0.22+54;
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('⌨',cx0-240,ctrlY1);
+  cx.fillStyle='#00ffff';cx.fillText('← →',cx0-185,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',cx0-110,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.3)';cx.fillText('|',cx0-30,ctrlY1);
+  cx.fillStyle='#ff00ff';cx.fillText('SPACE',cx0+30,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('= JUMP',cx0+120,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('🎮',cx0-240,ctrlY2);
+  cx.fillStyle='#00ffff';cx.fillText('L-STICK / D-PAD',cx0-120,ctrlY2);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',cx0+40,ctrlY2);
+  cx.fillStyle='rgba(255,255,255,.3)';cx.fillText('|',cx0+100,ctrlY2);
+  cx.fillStyle='#ff00ff';cx.fillText('X',cx0+130,ctrlY2);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('= JUMP',cx0+190,ctrlY2);
   const pw=260,ph=90,px2=cx0-pw/2,py2=H*0.28;
   drawNeonBtn(cx0-110,py2+20,220,56,'▶  PLAY GAME','#00ffff');
   drawHighscoreList(cx0,py2+90+6);
