@@ -164,7 +164,6 @@ function handleClick(e){if(!document.fullscreenElement&&document.documentElement
     if(menuState==='main'){
       const py2=H*0.28+20,btnH=56;
       if(mx>W/2-110&&mx<W/2+110&&my>py2&&my<py2+btnH){startMainMode();}
-      if(typeof TEST_LEVEL!=='undefined'&&mx>W/2+130&&mx<W/2+250&&my>py2&&my<py2+btnH){startTestMode();}
     }
   }
 }
@@ -553,7 +552,6 @@ function drawStartScreen(){
   cx.fillStyle='#aa00ff';cx.fillText('SPACE TO JUMP',cx0+110,ctrlY);
   const pw=260,ph=90,px2=cx0-pw/2,py2=H*0.28;
   drawNeonBtn(cx0-110,py2+20,220,56,'▶  PLAY GAME','#00ffff');
-  if(typeof TEST_LEVEL!=='undefined')drawNeonBtn(cx0+130,py2+20,120,56,'TEST','#ff00ff');
   drawHighscoreList(cx0,py2+90+6);
   cx.textAlign='left';
 }
