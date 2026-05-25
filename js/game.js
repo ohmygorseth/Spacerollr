@@ -546,18 +546,18 @@ function drawStartScreen(){
   cx.textAlign='left';
   cx.font='bold 15px Share Tech Mono, monospace';
   const ctrlY1=H*0.22+30,ctrlY2=H*0.22+54;
-  const divX=cx0+20; // pipe position
+  const divX=cx0-10;
   // Line 1
-  cx.fillStyle='rgba(255,255,255,.5)';cx.fillText('⌨',cx0-230,ctrlY1);
-  cx.fillStyle='#00ffff';cx.fillText('← →',cx0-200,ctrlY1);
-  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',cx0-155,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.5)';cx.fillText('⌨',divX-180,ctrlY1);
+  cx.fillStyle='#00ffff';cx.fillText('← →',divX-148,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',divX-100,ctrlY1);
   cx.fillStyle='rgba(255,255,255,.3)';cx.fillText('|',divX,ctrlY1);
   cx.fillStyle='#ff00ff';cx.fillText('SPACE',divX+18,ctrlY1);
-  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('= JUMP',divX+90,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('= JUMP',divX+88,ctrlY1);
   // Line 2
-  cx.fillStyle='rgba(255,255,255,.5)';cx.fillText('🎮',cx0-230,ctrlY2);
-  cx.fillStyle='#00ffff';cx.fillText('L-STICK',cx0-200,ctrlY2);
-  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',cx0-120,ctrlY2);
+  cx.fillStyle='rgba(255,255,255,.5)';cx.fillText('🎮',divX-180,ctrlY2);
+  cx.fillStyle='#00ffff';cx.fillText('L-STICK',divX-148,ctrlY2);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',divX-70,ctrlY2);
   cx.fillStyle='rgba(255,255,255,.3)';cx.fillText('|',divX,ctrlY2);
   cx.fillStyle='#ff00ff';cx.fillText('X',divX+18,ctrlY2);
   cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('= JUMP',divX+38,ctrlY2);
