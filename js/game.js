@@ -543,21 +543,25 @@ function drawStartScreen(){
   const cx0=W/2;
   drawSpaceBg();
   drawSpaceRollrLogo(cx0,H*0.22);
-  cx.textAlign='center';
-  cx.font='bold 16px Share Tech Mono, monospace';
+  cx.textAlign='left';
+  cx.font='bold 15px Share Tech Mono, monospace';
   const ctrlY1=H*0.22+30,ctrlY2=H*0.22+54;
-  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('⌨',cx0-240,ctrlY1);
-  cx.fillStyle='#00ffff';cx.fillText('← →',cx0-185,ctrlY1);
-  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',cx0-110,ctrlY1);
-  cx.fillStyle='rgba(255,255,255,.3)';cx.fillText('|',cx0-30,ctrlY1);
-  cx.fillStyle='#ff00ff';cx.fillText('SPACE',cx0+30,ctrlY1);
-  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('= JUMP',cx0+120,ctrlY1);
-  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('🎮',cx0-240,ctrlY2);
-  cx.fillStyle='#00ffff';cx.fillText('L-STICK / D-PAD',cx0-120,ctrlY2);
-  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',cx0+40,ctrlY2);
-  cx.fillStyle='rgba(255,255,255,.3)';cx.fillText('|',cx0+100,ctrlY2);
-  cx.fillStyle='#ff00ff';cx.fillText('X',cx0+130,ctrlY2);
-  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('= JUMP',cx0+190,ctrlY2);
+  const divX=cx0+20; // pipe position
+  // Line 1
+  cx.fillStyle='rgba(255,255,255,.5)';cx.fillText('⌨',cx0-230,ctrlY1);
+  cx.fillStyle='#00ffff';cx.fillText('← →',cx0-200,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',cx0-155,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.3)';cx.fillText('|',divX,ctrlY1);
+  cx.fillStyle='#ff00ff';cx.fillText('SPACE',divX+18,ctrlY1);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('= JUMP',divX+90,ctrlY1);
+  // Line 2
+  cx.fillStyle='rgba(255,255,255,.5)';cx.fillText('🎮',cx0-230,ctrlY2);
+  cx.fillStyle='#00ffff';cx.fillText('L-STICK',cx0-200,ctrlY2);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('MOVE',cx0-120,ctrlY2);
+  cx.fillStyle='rgba(255,255,255,.3)';cx.fillText('|',divX,ctrlY2);
+  cx.fillStyle='#ff00ff';cx.fillText('X',divX+18,ctrlY2);
+  cx.fillStyle='rgba(255,255,255,.6)';cx.fillText('= JUMP',divX+38,ctrlY2);
+  cx.textAlign='center';
   const pw=260,ph=90,px2=cx0-pw/2,py2=H*0.28;
   drawNeonBtn(cx0-110,py2+20,220,56,'▶  PLAY GAME','#00ffff');
   drawHighscoreList(cx0,py2+90+6);
