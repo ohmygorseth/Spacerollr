@@ -11916,5 +11916,3 @@ const LEVEL1=[
 ];
 
 const LEVELS = [LEVEL1];
-
-const LEVELS = [LEVEL1];
