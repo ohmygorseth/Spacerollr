@@ -145,6 +145,7 @@ cv.addEventListener('touchend',e=>{
 document.addEventListener('keydown',e=>{
   if(enteringName){
     e.preventDefault();
+    if(e.key==='Escape'){enteringName=false;state='start';menuState='main';return;}
     if(e.key==='Enter'&&nameInput.length>0){addHS(nameInput,score);enteringName=false;state=camZ+PZ>=currentLevelData().length?'levelcomplete':'dead';}
     else if(e.key==='Backspace'){nameInput=nameInput.slice(0,-1);}
     else if(e.key.length===1&&nameInput.length<12){nameInput+=e.key;}
