@@ -81,6 +81,68 @@ function buildSkinCanvas(skin){
 }
 const SKIN_CANVASES=SKINS.map(buildSkinCanvas);
 
+// ── Rolling 3D sphere frames ──
+function buildTexture(skin,tw,th){
+  const tc=document.createElement('canvas');tc.width=tw;tc.height=th;
+  const t=tc.getContext('2d');
+  if(skin.type==='radial'){t.fillStyle=skin.c2;t.fillRect(0,0,tw,th);}
+  else if(skin.type==='football'){
+    t.fillStyle='#f0f0f0';t.fillRect(0,0,tw,th);
+    for(let gx=0;gx<tw;gx+=24)for(let gy=0;gy<th;gy+=24){
+      const off=((gy/24)|0)%2?12:0;t.fillStyle='#1e1e1e';t.beginPath();t.arc(gx+off,gy+12,7,0,Math.PI*2);t.fill();}
+  } else if(skin.type==='stripes'){
+    for(let x=0;x<tw;x++){t.fillStyle=((x/8)|0)%2===0?skin.c1:skin.c2;t.fillRect(x,0,1,th);}
+  } else if(skin.type==='dots'){
+    t.fillStyle=skin.c1;t.fillRect(0,0,tw,th);
+    for(let gx=0;gx<tw;gx+=14)for(let gy=0;gy<th;gy+=14){
+      const off=((gy/14)|0)%2?7:0;t.fillStyle=skin.c2;t.beginPath();t.arc(gx+off,gy+7,4,0,Math.PI*2);t.fill();}
+  } else if(skin.type==='galaxy'){
+    t.fillStyle='#140032';t.fillRect(0,0,tw,th);
+    for(let i=0;i<60;i++){const v=150+(Math.random()*105|0);t.fillStyle='rgb('+v+','+v+','+v+')';t.fillRect(Math.random()*tw|0,Math.random()*th|0,1,1);}
+  }
+  return t.getImageData(0,0,tw,th);
+}
+
+const N_FRAMES=16;
+function buildSphereFrames(skin){
+  const size=BR*2,r=size/2-2,cx0=size/2,cy0=size/2;
+  const tw=96,th=48;
+  const tex=buildTexture(skin,tw,th);
+  const frames=[];
+  for(let f=0;f<N_FRAMES;f++){
+    const roll=(f/N_FRAMES)*2*Math.PI;
+    const fc=document.createElement('canvas');fc.width=size;fc.height=size;
+    const fx=fc.getContext('2d');
+    const img=fx.createImageData(size,size);
+    const cosR=Math.cos(roll),sinR=Math.sin(roll);
+    for(let py=0;py<size;py++){
+      for(let px=0;px<size;px++){
+        const dx=px-cx0,dy=py-cy0,d2=dx*dx+dy*dy;
+        if(d2>r*r)continue;
+        const nz=Math.sqrt(Math.max(0,r*r-d2));
+        const nx=dx/r,ny=dy/r,nzn=nz/r;
+        const ry=ny*cosR-nzn*sinR;
+        const rz=ny*sinR+nzn*cosR;
+        const lon=Math.atan2(nx,rz);
+        const lat=Math.asin(Math.max(-1,Math.min(1,ry)));
+        let u=((lon/(2*Math.PI)+0.5)*tw|0)%tw;if(u<0)u+=tw;
+        let v=((lat/Math.PI+0.5)*th|0)%th;if(v<0)v+=th;
+        const ti=(v*tw+u)*4;
+        const shade=0.55+0.45*nzn;
+        const oi=(py*size+px)*4;
+        img.data[oi]=tex.data[ti]*shade;
+        img.data[oi+1]=tex.data[ti+1]*shade;
+        img.data[oi+2]=tex.data[ti+2]*shade;
+        img.data[oi+3]=255;
+      }
+    }
+    fx.putImageData(img,0,0);
+    frames.push(fc);
+  }
+  return frames;
+}
+const SKIN_FRAMES=SKINS.map(buildSphereFrames);
+
 function reset(){camZ=0;px=0;pvx=0;jy=0;jvy=0;spd=CONFIG.BASE_SPEED;score=0;pts=[];rot=0;track=[];tBase=0;growTrack(0);state='play';}
 function die(){
   stopMusic();playDie();
@@ -389,9 +451,10 @@ function drawBall(){
   const p=pr(PZ),bx=W/2+(px/THW)*p.hw,gY=p.y-BR,by=gY+jy;
   cx.beginPath();cx.ellipse(bx,gY+3,BR*.75,BR*.2,0,0,Math.PI*2);
   cx.fillStyle='rgba(0,0,0,'+Math.max(0,.4+jy*.003)+')';cx.fill();
-  cx.save();cx.translate(bx,by);cx.rotate(rot);
-  cx.drawImage(SKIN_CANVASES[selectedSkin],-BR,-BR,BR*2,BR*2);
-  cx.restore();
+  const frames=SKIN_FRAMES[selectedSkin];
+  const fi=((rot/(2*Math.PI))*frames.length|0)%frames.length;
+  const idx=fi<0?fi+frames.length:fi;
+  cx.drawImage(frames[idx],bx-BR,by-BR,BR*2,BR*2);
 }
 function drawParticles(){for(const p of pts){cx.beginPath();cx.arc(p.x,p.y,Math.max(1,3*p.life),0,Math.PI*2);cx.fillStyle=p.col+(Math.min(255,(p.life*2*255)|0).toString(16).padStart(2,'0'));cx.fill();}}
 function drawHUD(){
