@@ -172,6 +172,17 @@ function nextLevel(){
 
 const K={};
 let tL=0,tR=0,tJ=0;
+// Touch device detection
+const IS_TOUCH = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+// Virtual joystick state
+let joyActive=false, joyId=null, joyBaseX=0, joyBaseY=0, joyCurX=0, joyCurY=0, joyDX=0;
+let jumpTouchId=null;
+const JOY_MAX=70; // max drag radius in canvas px
+
+function canvasCoords(t){
+  const r=cv.getBoundingClientRect();
+  return {x:(t.clientX-r.left)*(W/r.width), y:(t.clientY-r.top)*(H/r.height)};
+}
 
 cv.addEventListener('touchstart',e=>{
   e.preventDefault();
@@ -180,30 +191,44 @@ cv.addEventListener('touchstart',e=>{
     if(state==='start'){handleClick(e.changedTouches[0]);return;}
     return;
   }
-  const r=cv.getBoundingClientRect();
   for(const t of e.changedTouches){
-    const tx=(t.clientX-r.left)*(W/r.width);
-    const ty=(t.clientY-r.top)*(H/r.height);
-    if(ty>H*0.72){
-      if(tx<W/3)tL=1;
-      else if(tx<W*2/3)tJ=1;
-      else tR=1;
+    const p=canvasCoords(t);
+    if(p.x < W/2){
+      // Left half = joystick
+      if(!joyActive){
+        joyActive=true; joyId=t.identifier;
+        joyBaseX=p.x; joyBaseY=p.y; joyCurX=p.x; joyCurY=p.y; joyDX=0;
+      }
+    } else {
+      // Right half = jump
+      if(jumpTouchId===null){ jumpTouchId=t.identifier; tJ=1; }
     }
   }
 },{passive:false});
 
-cv.addEventListener('touchend',e=>{
-  const r=cv.getBoundingClientRect();
+cv.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  if(state!=='play')return;
   for(const t of e.changedTouches){
-    const tx=(t.clientX-r.left)*(W/r.width);
-    const ty=(t.clientY-r.top)*(H/r.height);
-    if(ty>H*0.72){
-      if(tx<W/3)tL=0;
-      else if(tx<W*2/3)tJ=0;
-      else tR=0;
+    if(t.identifier===joyId){
+      const p=canvasCoords(t);
+      let dx=p.x-joyBaseX, dy=p.y-joyBaseY;
+      const dist=Math.hypot(dx,dy);
+      if(dist>JOY_MAX){ dx*=JOY_MAX/dist; dy*=JOY_MAX/dist; }
+      joyCurX=joyBaseX+dx; joyCurY=joyBaseY+dy;
+      joyDX=dx/JOY_MAX; // -1..1
     }
   }
-});
+},{passive:false});
+
+function endTouch(e){
+  for(const t of e.changedTouches){
+    if(t.identifier===joyId){ joyActive=false; joyId=null; joyDX=0; }
+    if(t.identifier===jumpTouchId){ jumpTouchId=null; tJ=0; }
+  }
+}
+cv.addEventListener('touchend',endTouch);
+cv.addEventListener('touchcancel',endTouch);
 document.addEventListener('keydown',e=>{
   if(enteringName){
     e.preventDefault();
@@ -358,7 +383,7 @@ function update(t){const gp=readGamepad();
   }
   if(state!=='play'){if((state==='dead'||state==='start')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=(scoreOffset+Math.floor(camZ))*12|0;const totalTiles=scoreOffset+Math.floor(camZ);if(gameMode==='test'){const tilesAfter=Math.max(0,totalTiles-100);const baseSpd=Math.min(CONFIG.MAX_SPEED,CONFIG.BASE_SPEED+totalTiles*CONFIG.SPEED_GROWTH);spd=Math.min(25,baseSpd+Math.floor(tilesAfter/5));}else{const tilesAfter=Math.max(0,totalTiles-1827);const baseSpd=Math.min(CONFIG.MAX_SPEED,CONFIG.BASE_SPEED+totalTiles*CONFIG.SPEED_GROWTH);spd=Math.min(25,baseSpd+Math.floor(tilesAfter/5));}const curSpeedLevel=Math.floor(spd);
 if(curSpeedLevel>lastSpeedLevel){lastSpeedLevel=curSpeedLevel;speedNotif=3;}
-if(speedNotif>0)speedNotif-=dt;const left=K['ArrowLeft']||tL||gp.left,right=K['ArrowRight']||tR||gp.right,jump=K[' ']||tJ||gp.jump;pvx+=((right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0)-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;playJump();jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ);
+if(speedNotif>0)speedNotif-=dt;const left=K['ArrowLeft']||gp.left,right=K['ArrowRight']||gp.right,jump=K[' ']||tJ||gp.jump;let targetVX=right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0;if(joyActive)targetVX=joyDX*CONFIG.LATERAL_SPEED;pvx+=(targetVX-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;playJump();jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ);
 const ballW=0.15;
 const colL=Math.max(0,Math.min(COLS-1,Math.floor(px+THW-ballW)));
 const colR=Math.max(0,Math.min(COLS-1,Math.floor(px+THW+ballW)));
@@ -651,18 +676,31 @@ function drawEnterName(){
   cx.textAlign='left';
 }
 
-function drawTouchBtns(){
-  const bw=W/4-8,bh=52,by=H-bh-8;
-  const btns=[[8,'←',tL],[W/2-bw/2,'●',tJ],[W-bw-8,'→',tR]];
-  btns.forEach(([x,lbl,on])=>{
-    cx.fillStyle=on?'rgba(0,255,255,.25)':'rgba(255,255,255,.07)';
-    cx.fillRect(x,by,bw,bh);
-    cx.strokeStyle=on?'#00ffff':'rgba(255,255,255,.15)';
-    cx.lineWidth=1.5;cx.strokeRect(x,by,bw,bh);
-    cx.fillStyle=on?'#00ffff':'rgba(255,255,255,.5)';
-    cx.font='bold 22px Share Tech Mono, monospace';cx.textAlign='center';
-    cx.fillText(lbl,x+bw/2,by+34);
-  });
+function drawTouchControls(){
+  // Left joystick
+  if(joyActive){
+    cx.strokeStyle='rgba(0,255,255,.35)';cx.lineWidth=3;
+    cx.beginPath();cx.arc(joyBaseX,joyBaseY,JOY_MAX,0,Math.PI*2);cx.stroke();
+    cx.fillStyle='rgba(0,255,255,.45)';
+    cx.beginPath();cx.arc(joyCurX,joyCurY,28,0,Math.PI*2);cx.fill();
+    cx.strokeStyle='#00ffff';cx.lineWidth=2;
+    cx.beginPath();cx.arc(joyCurX,joyCurY,28,0,Math.PI*2);cx.stroke();
+  } else {
+    // Hint circle bottom-left
+    cx.strokeStyle='rgba(255,255,255,.12)';cx.lineWidth=2;
+    cx.beginPath();cx.arc(W*0.18,H-90,JOY_MAX,0,Math.PI*2);cx.stroke();
+    cx.fillStyle='rgba(255,255,255,.2)';cx.font='12px Share Tech Mono, monospace';cx.textAlign='center';
+    cx.fillText('STYR',W*0.18,H-86);
+  }
+  // Right jump button
+  const jx=W*0.82, jy2=H-90, jr=64;
+  cx.fillStyle=tJ?'rgba(255,0,255,.35)':'rgba(255,255,255,.07)';
+  cx.beginPath();cx.arc(jx,jy2,jr,0,Math.PI*2);cx.fill();
+  cx.strokeStyle=tJ?'#ff00ff':'rgba(255,255,255,.2)';cx.lineWidth=2;
+  cx.beginPath();cx.arc(jx,jy2,jr,0,Math.PI*2);cx.stroke();
+  cx.fillStyle=tJ?'#ff00ff':'rgba(255,255,255,.5)';
+  cx.font='bold 16px Share Tech Mono, monospace';cx.textAlign='center';
+  cx.fillText('HOPP',jx,jy2+6);
   // Mobile warning
   const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
   if(isMobile){
@@ -869,10 +907,20 @@ function loop(t){
       else if(menuState==='skinselect')drawSkinSelect();
     } else {
       drawBg();drawTrack();drawParticles();drawBall();drawHUD();
+      if(IS_TOUCH && state==='play')drawTouchControls();
       if(state==='dead')drawOverlay('GAME OVER',gameMode==='select'?'':'Score: '+score,'');
 
       if(state==='levelcomplete')drawLevelComplete();
       if(state==='enter_name')drawEnterName();
+    }
+    // Rotate-your-device overlay for portrait phones
+    if(IS_TOUCH && window.innerHeight > window.innerWidth){
+      cx.fillStyle='rgba(0,0,15,0.95)';cx.fillRect(0,0,W,H);
+      cx.fillStyle='#00ffff';cx.font='bold 28px Share Tech Mono, monospace';cx.textAlign='center';
+      cx.fillText('VRI SKJERMEN', W/2, H/2-20);
+      cx.fillStyle='rgba(255,255,255,.6)';cx.font='16px Share Tech Mono, monospace';
+      cx.fillText('Spillet spilles i liggende modus', W/2, H/2+20);
+      cx.textAlign='left';
     }
   }catch(err){console.error(err);}
 }
