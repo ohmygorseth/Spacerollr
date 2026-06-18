@@ -148,7 +148,7 @@ function die(){
   stopMusic();playDie();
   if(gameMode==='select'){state='dead';return;}
   if(score>hi)hi=score;
-  if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}
+  if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;if(IS_TOUCH)openMobileNameInput();}
   else{state='dead';}
   fetchGlobalScores();
 }
@@ -165,7 +165,7 @@ function nextLevel(){
   } else {
     completeLevel(currentLevel);
     if(score>hi)hi=score;
-    if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;}
+    if(isHighscore(score)){state='enter_name';nameInput='';enteringName=true;if(IS_TOUCH)openMobileNameInput();}
     else{state='levelcomplete';}
   }
 }
@@ -174,6 +174,45 @@ const K={};
 let tL=0,tR=0,tJ=0;
 // Touch device detection
 const IS_TOUCH = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+// ── Hidden input for mobile keyboard during name entry ──
+const mobileNameInput = document.createElement('input');
+mobileNameInput.type = 'text';
+mobileNameInput.maxLength = 12;
+mobileNameInput.autocomplete = 'off';
+mobileNameInput.autocapitalize = 'characters';
+mobileNameInput.style.position = 'fixed';
+mobileNameInput.style.opacity = '0';
+mobileNameInput.style.pointerEvents = 'none';
+mobileNameInput.style.left = '-9999px';
+mobileNameInput.style.top = '0';
+document.body.appendChild(mobileNameInput);
+
+mobileNameInput.addEventListener('input', () => {
+  nameInput = mobileNameInput.value.toUpperCase().slice(0,12);
+});
+mobileNameInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && nameInput.length > 0){
+    e.preventDefault();
+    addHS(nameInput, score);
+    enteringName = false;
+    mobileNameInput.blur();
+    state = camZ+PZ >= currentLevelData().length ? 'levelcomplete' : 'dead';
+  }
+});
+
+function openMobileNameInput(){
+  mobileNameInput.value = nameInput;
+  mobileNameInput.style.pointerEvents = 'auto';
+  mobileNameInput.style.left = '0';
+  mobileNameInput.style.top = '-1000px'; // off-screen but focusable
+  mobileNameInput.focus();
+}
+function closeMobileNameInput(){
+  mobileNameInput.blur();
+  mobileNameInput.style.pointerEvents = 'none';
+  mobileNameInput.style.left = '-9999px';
+}
 // Virtual joystick state
 let joyActive=false, joyId=null, joyBaseX=0, joyBaseY=0, joyCurX=0, joyCurY=0, joyDX=0;
 let jumpTouchId=null;
@@ -189,6 +228,7 @@ cv.addEventListener('touchstart',e=>{
   if(state!=='play'){
     if(state==='dead'||state==='levelcomplete'){state='start';menuState='main';return;}
     if(state==='start'){handleClick(e.changedTouches[0]);return;}
+    if(state==='enter_name'){if(IS_TOUCH)openMobileNameInput();return;}
     return;
   }
   for(const t of e.changedTouches){
@@ -232,7 +272,7 @@ cv.addEventListener('touchcancel',endTouch);
 document.addEventListener('keydown',e=>{
   if(enteringName){
     e.preventDefault();
-    if(e.key==='Escape'){enteringName=false;state='start';menuState='main';return;}
+    if(e.key==='Escape'){enteringName=false;closeMobileNameInput();state='start';menuState='main';return;}
     if(e.key==='Enter'&&nameInput.length>0){addHS(nameInput,score);enteringName=false;state=camZ+PZ>=currentLevelData().length?'levelcomplete':'dead';}
     else if(e.key==='Backspace'){nameInput=nameInput.slice(0,-1);}
     else if(e.key.length===1&&nameInput.length<12){nameInput+=e.key;}
@@ -672,7 +712,8 @@ function drawEnterName(){
     cx.fillText(letter,cx0,py2+140);
     cx.textAlign='left';
   }
-  cx.fillStyle='rgba(255,255,255,.35)';cx.font='10px Share Tech Mono, monospace';cx.fillText('PRESS ENTER TO SAVE',cx0,py2+ph-12);
+  cx.fillStyle='rgba(255,255,255,.35)';cx.font='10px Share Tech Mono, monospace';
+  cx.fillText(IS_TOUCH?'TRYKK FELTET FOR Å SKRIVE  •  ENTER PÅ TASTATUR = LAGRE':'PRESS ENTER TO SAVE',cx0,py2+ph-12);
   cx.textAlign='left';
 }
 
