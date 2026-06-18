@@ -6,105 +6,107 @@
   <title>Space Rollr</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #000; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-    canvas { display: block; touch-action: none; }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{width:100%;height:100%;background:#000;overflow:hidden;}
 
-    #touch-controls {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      z-index: 10;
+    /* Default: canvas fills screen (PC + portrait mobile) */
+    #layout{
+      width:100%;height:100%;
+      display:flex;align-items:center;justify-content:center;
     }
-    #joy-zone {
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 110px;
-      display: flex; align-items: center; justify-content: center;
-      pointer-events: all;
-      touch-action: none;
+    #joy-zone, #jump-zone{ display:none; }
+    canvas{display:block;touch-action:none;}
+
+    /* Landscape touch: side panels + canvas in middle */
+    body.touch-landscape #layout{
+      flex-direction:row;
     }
-    #joy-base {
-      width: 90px; height: 90px;
-      border-radius: 50%;
-      border: 2px solid rgba(0,255,255,0.3);
-      background: rgba(0,255,255,0.05);
-      position: relative;
-      touch-action: none;
+    body.touch-landscape #joy-zone,
+    body.touch-landscape #jump-zone{
+      display:flex;
+      flex:0 0 120px;height:100%;
+      align-items:center;justify-content:center;
+      background:#000;touch-action:none;
     }
-    #joy-knob {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: rgba(0,255,255,0.5);
-      border: 2px solid #00ffff;
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      pointer-events: none;
+    body.touch-landscape canvas{
+      flex:1;
+      max-height:100%;
+      max-width:calc(100% - 240px);
     }
-    #jump-zone {
-      position: absolute;
-      right: 0; top: 0; bottom: 0;
-      width: 110px;
-      display: flex; align-items: center; justify-content: center;
-      pointer-events: all;
-      touch-action: none;
+
+    /* Joystick */
+    #joy-base{
+      width:90px;height:90px;border-radius:50%;
+      border:2px solid rgba(0,255,255,0.4);
+      background:rgba(0,255,255,0.05);
+      position:relative;touch-action:none;
     }
-    #jump-btn {
-      width: 90px; height: 90px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,0,255,0.3);
-      background: rgba(255,0,255,0.05);
-      display: flex; align-items: center; justify-content: center;
-      color: rgba(255,255,255,0.5);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 14px; font-weight: bold;
-      touch-action: none; user-select: none;
+    #joy-knob{
+      width:40px;height:40px;border-radius:50%;
+      background:rgba(0,255,255,0.5);border:2px solid #00ffff;
+      position:absolute;top:50%;left:50%;
+      transform:translate(-50%,-50%);pointer-events:none;
     }
-    #jump-btn.active {
-      background: rgba(255,0,255,0.35);
-      border-color: #ff00ff;
-      color: #ff00ff;
+    /* Jump button */
+    #jump-btn{
+      width:90px;height:90px;border-radius:50%;
+      border:2px solid rgba(255,0,255,0.4);
+      background:rgba(255,0,255,0.05);
+      display:flex;align-items:center;justify-content:center;
+      color:rgba(255,255,255,0.6);
+      font-family:'Share Tech Mono',monospace;font-size:14px;font-weight:bold;
+      touch-action:none;user-select:none;
     }
+    #jump-btn.active{
+      background:rgba(255,0,255,0.4);
+      border-color:#ff00ff;color:#ff00ff;
+    }
+
+    /* Portrait overlay */
+    #rotate-msg{
+      display:none;position:fixed;inset:0;background:rgba(0,0,15,0.97);
+      flex-direction:column;align-items:center;justify-content:center;
+      color:#00ffff;font-family:'Share Tech Mono',monospace;text-align:center;z-index:99;
+    }
+    body.touch-portrait #rotate-msg{ display:flex; }
+    #rotate-msg h1{font-size:22px;margin-bottom:12px;}
+    #rotate-msg p{font-size:14px;color:rgba(255,255,255,0.5);}
   </style>
 </head>
 <body>
-  <canvas id="c"></canvas>
-
-  <div id="touch-controls">
+  <div id="layout">
     <div id="joy-zone">
       <div id="joy-base"><div id="joy-knob"></div></div>
     </div>
+    <canvas id="c"></canvas>
     <div id="jump-zone">
-      <div id="jump-btn" id="jump-btn">HOPP</div>
+      <div id="jump-btn">HOPP</div>
     </div>
+  </div>
+
+  <div id="rotate-msg">
+    <h1>VRI SKJERMEN</h1>
+    <p>Spillet spilles i liggende modus</p>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-app-compat.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-database-compat.min.js"></script>
   <script>
     firebase.initializeApp({
-      apiKey: "AIzaSyBM5Ory6ZSESYsL68u7HGGVATQpT5mB3GQ",
-      authDomain: "space-rollr.firebaseapp.com",
-      databaseURL: "https://space-rollr-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "space-rollr",
-      storageBucket: "space-rollr.firebasestorage.app",
-      messagingSenderId: "546982544672",
-      appId: "1:546982544672:web:e06512218c64128fa38345"
+      apiKey:"AIzaSyBM5Ory6ZSESYsL68u7HGGVATQpT5mB3GQ",
+      authDomain:"space-rollr.firebaseapp.com",
+      databaseURL:"https://space-rollr-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId:"space-rollr",storageBucket:"space-rollr.firebasestorage.app",
+      messagingSenderId:"546982544672",
+      appId:"1:546982544672:web:e06512218c64128fa38345"
     });
-    const db = firebase.database();
-    window.fbSubmitScore = function(name, score) {
-      return db.ref('scores').push({ name: name, score: score, ts: Date.now() });
-    };
-    db.ref('scores').on('value', function(snap) {
-      var scores = [];
-      snap.forEach(function(child) { scores.push(child.val()); });
-      window.globalScoresCache = scores.sort(function(a,b){return b.score-a.score;}).slice(0,100);
+    const db=firebase.database();
+    window.fbSubmitScore=function(n,s){return db.ref('scores').push({name:n,score:s,ts:Date.now()});};
+    db.ref('scores').on('value',function(snap){
+      var s=[];snap.forEach(function(c){s.push(c.val());});
+      window.globalScoresCache=s.sort(function(a,b){return b.score-a.score;}).slice(0,100);
     });
-    window.fbGetScores = function() {
-      return Promise.resolve(window.globalScoresCache || []);
-    };
+    window.fbGetScores=function(){return Promise.resolve(window.globalScoresCache||[]);};
   </script>
 
   <script src="js/config.js"></script>
@@ -113,74 +115,68 @@
   <script src="js/game.js"></script>
 
   <script>
-    const IS_TOUCH = ('ontouchstart' in window)||(navigator.maxTouchPoints>0);
-    const controls = document.getElementById('touch-controls');
-    const joyBase  = document.getElementById('joy-base');
-    const joyKnob  = document.getElementById('joy-knob');
-    const jumpBtn  = document.getElementById('jump-btn');
-    const jumpZone = document.getElementById('jump-zone');
-    const JR = 40;
+    const IS_TOUCH=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+    const joyBase=document.getElementById('joy-base');
+    const joyKnob=document.getElementById('joy-knob');
+    const jumpBtn=document.getElementById('jump-btn');
+    const jumpZone=document.getElementById('jump-zone');
+    const JR=40;
 
-    function updateControlVisibility() {
-      const landscape = window.innerWidth > window.innerHeight;
-      const playing = window.gameState === 'play';
-      if (IS_TOUCH && landscape && playing) {
-        controls.style.display = 'block';
-      } else {
-        controls.style.display = 'none';
-        joyReset();
-        window.tJ = 0;
-        jumpBtn.classList.remove('active');
+    function updateLayout(){
+      if(!IS_TOUCH){document.body.className='';return;}
+      const landscape=window.innerWidth>window.innerHeight;
+      document.body.className=landscape?'touch-landscape':'touch-portrait';
+    }
+    window.addEventListener('resize',updateLayout);
+    window.addEventListener('orientationchange',updateLayout);
+    updateLayout();
+
+    // Show/hide controls based on game state
+    window.onGameStateChange=function(state){
+      const playing=state==='play';
+      const landscape=window.innerWidth>window.innerHeight;
+      if(IS_TOUCH && landscape){
+        joyBase.parentElement.style.visibility=playing?'visible':'hidden';
+        jumpZone.style.visibility=playing?'visible':'hidden';
       }
-    }
-    window.addEventListener('resize', updateControlVisibility);
-    window.addEventListener('orientationchange', updateControlVisibility);
-    setInterval(updateControlVisibility, 200);
+      if(!playing){joyReset();window.tJ=0;jumpBtn.classList.remove('active');}
+    };
 
-    let _joyId = null;
-    function joyMove(cx, cy) {
-      const rect = joyBase.getBoundingClientRect();
-      const bx = rect.left + rect.width/2;
-      const by = rect.top + rect.height/2;
-      let dx = cx-bx, dy = cy-by;
-      const dist = Math.hypot(dx,dy);
-      if (dist > JR) { dx*=JR/dist; dy*=JR/dist; }
-      joyKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-      window.joyDX = dx/JR;
-      window.joyActive = true;
+    // Joystick
+    let _joyId=null;
+    function joyMove(cx,cy){
+      const r=joyBase.getBoundingClientRect();
+      const bx=r.left+r.width/2,by=r.top+r.height/2;
+      let dx=cx-bx,dy=cy-by;
+      const d=Math.hypot(dx,dy);
+      if(d>JR){dx*=JR/d;dy*=JR/d;}
+      joyKnob.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
+      window.joyDX=dx/JR;window.joyActive=true;
     }
-    function joyReset() {
-      joyKnob.style.transform = 'translate(-50%,-50%)';
-      window.joyDX = 0;
-      window.joyActive = false;
-      _joyId = null;
+    function joyReset(){
+      joyKnob.style.transform='translate(-50%,-50%)';
+      window.joyDX=0;window.joyActive=false;_joyId=null;
     }
 
-    joyBase.addEventListener('touchstart', e=>{
-      e.preventDefault();
-      const t = e.changedTouches[0];
-      _joyId = t.identifier;
-      joyMove(t.clientX, t.clientY);
+    joyBase.addEventListener('touchstart',e=>{
+      e.preventDefault();e.stopPropagation();
+      const t=e.changedTouches[0];_joyId=t.identifier;joyMove(t.clientX,t.clientY);
     },{passive:false});
-
-    document.addEventListener('touchmove', e=>{
-      for (const t of e.changedTouches) {
-        if (t.identifier===_joyId) { e.preventDefault(); joyMove(t.clientX,t.clientY); }
+    document.addEventListener('touchmove',e=>{
+      for(const t of e.changedTouches){
+        if(t.identifier===_joyId){e.preventDefault();joyMove(t.clientX,t.clientY);}
       }
     },{passive:false});
-
-    document.addEventListener('touchend', e=>{
-      for (const t of e.changedTouches) { if(t.identifier===_joyId) joyReset(); }
+    document.addEventListener('touchend',e=>{
+      for(const t of e.changedTouches){if(t.identifier===_joyId)joyReset();}
     });
 
-    jumpZone.addEventListener('touchstart', e=>{
-      e.preventDefault();
-      jumpBtn.classList.add('active');
-      window.tJ = 1;
+    jumpZone.addEventListener('touchstart',e=>{
+      e.preventDefault();e.stopPropagation();
+      jumpBtn.classList.add('active');window.tJ=1;
     },{passive:false});
-    jumpZone.addEventListener('touchend', ()=>{
-      jumpBtn.classList.remove('active');
-      window.tJ = 0;
+    jumpZone.addEventListener('touchend',()=>{
+      jumpBtn.classList.remove('active');window.tJ=0;
     });
   </script>
 </body>
