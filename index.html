@@ -2,12 +2,96 @@
 <html lang="no">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Space Rollr</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    #touch-controls {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 160px;
+      background: #000;
+      touch-action: none;
+      z-index: 10;
+    }
+    #joystick-zone {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #joystick-base {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,255,255,0.3);
+      background: rgba(0,255,255,0.05);
+      position: relative;
+      touch-action: none;
+    }
+    #joystick-knob {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      background: rgba(0,255,255,0.5);
+      border: 2px solid #00ffff;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      transition: background 0.1s;
+      pointer-events: none;
+    }
+    #jump-zone {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+    }
+    #jump-btn {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,0,255,0.3);
+      background: rgba(255,0,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.5);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      touch-action: none;
+      user-select: none;
+    }
+    #jump-btn.active {
+      background: rgba(255,0,255,0.35);
+      border-color: #ff00ff;
+      color: #ff00ff;
+    }
+    @media (pointer: coarse) {
+      #touch-controls { display: block; }
+      body { overflow: hidden; }
+      canvas { display: block; }
+    }
+  </style>
 </head>
 <body>
   <canvas id="c"></canvas>
+
+  <div id="touch-controls">
+    <div id="joystick-zone">
+      <div id="joystick-base">
+        <div id="joystick-knob"></div>
+      </div>
+    </div>
+    <div id="jump-zone">
+      <div id="jump-btn">HOPP</div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-app-compat.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.0/firebase-database-compat.min.js"></script>
@@ -39,5 +123,67 @@
   <script src="js/levels.js"></script>
   <script src="js/test.js"></script>
   <script src="js/game.js"></script>
+
+  <script>
+    // HTML joystick wiring
+    const base = document.getElementById('joystick-base');
+    const knob = document.getElementById('joystick-knob');
+    const jumpBtn = document.getElementById('jump-btn');
+    const jumpZone = document.getElementById('jump-zone');
+
+    let _joyTouchId = null;
+    const JR = 55; // max drag radius in px
+
+    function joyMove(cx, cy) {
+      const rect = base.getBoundingClientRect();
+      const bx = rect.left + rect.width/2;
+      const by = rect.top + rect.height/2;
+      let dx = cx - bx, dy = cy - by;
+      const dist = Math.hypot(dx, dy);
+      if (dist > JR) { dx *= JR/dist; dy *= JR/dist; }
+      knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+      window.joyDX = dx / JR; // expose to game.js
+      window.joyActive = true;
+    }
+
+    function joyReset() {
+      knob.style.transform = 'translate(-50%, -50%)';
+      window.joyDX = 0;
+      window.joyActive = false;
+      _joyTouchId = null;
+    }
+
+    base.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const t = e.changedTouches[0];
+      _joyTouchId = t.identifier;
+      joyMove(t.clientX, t.clientY);
+    }, {passive:false});
+
+    document.addEventListener('touchmove', e => {
+      for (const t of e.changedTouches) {
+        if (t.identifier === _joyTouchId) {
+          e.preventDefault();
+          joyMove(t.clientX, t.clientY);
+        }
+      }
+    }, {passive:false});
+
+    document.addEventListener('touchend', e => {
+      for (const t of e.changedTouches) {
+        if (t.identifier === _joyTouchId) joyReset();
+      }
+    });
+
+    jumpZone.addEventListener('touchstart', e => {
+      e.preventDefault();
+      jumpBtn.classList.add('active');
+      window.tJ = 1;
+    }, {passive:false});
+    jumpZone.addEventListener('touchend', e => {
+      jumpBtn.classList.remove('active');
+      window.tJ = 0;
+    });
+  </script>
 </body>
 </html>
