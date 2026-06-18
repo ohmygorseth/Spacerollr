@@ -423,7 +423,7 @@ function update(t){const gp=readGamepad();
   }
   if(state!=='play'){if((state==='dead'||state==='start')&&(gp.start||gp.jump))go();return;}const dt=Math.min((t-prevT)/1000,.05);prevT=t;camZ+=spd*dt;score=(scoreOffset+Math.floor(camZ))*12|0;const totalTiles=scoreOffset+Math.floor(camZ);if(gameMode==='test'){const tilesAfter=Math.max(0,totalTiles-100);const baseSpd=Math.min(CONFIG.MAX_SPEED,CONFIG.BASE_SPEED+totalTiles*CONFIG.SPEED_GROWTH);spd=Math.min(25,baseSpd+Math.floor(tilesAfter/5));}else{const tilesAfter=Math.max(0,totalTiles-1827);const baseSpd=Math.min(CONFIG.MAX_SPEED,CONFIG.BASE_SPEED+totalTiles*CONFIG.SPEED_GROWTH);spd=Math.min(25,baseSpd+Math.floor(tilesAfter/5));}const curSpeedLevel=Math.floor(spd);
 if(curSpeedLevel>lastSpeedLevel){lastSpeedLevel=curSpeedLevel;speedNotif=3;}
-if(speedNotif>0)speedNotif-=dt;const left=K['ArrowLeft']||gp.left,right=K['ArrowRight']||gp.right,jump=K[' ']||tJ||gp.jump;let targetVX=right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0;if(joyActive)targetVX=joyDX*CONFIG.LATERAL_SPEED;pvx+=(targetVX-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;playJump();jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ);
+if(speedNotif>0)speedNotif-=dt;const left=K['ArrowLeft']||gp.left,right=K['ArrowRight']||gp.right,jump=K[' ']||(window.tJ||tJ)||gp.jump;let targetVX=right?CONFIG.LATERAL_SPEED:left?-CONFIG.LATERAL_SPEED:0;if(window.joyActive)targetVX=window.joyDX*CONFIG.LATERAL_SPEED;pvx+=(targetVX-pvx)*CONFIG.LATERAL_DRAG*dt;px=Math.max(-THW+.12,Math.min(THW-.12,px+pvx*dt));rot+=spd*dt*(1/BR)*8+pvx*3*dt;if(jump&&jy>=0){jvy=CONFIG.JUMP_VY;playJump();jy=-1;}jvy+=CONFIG.GRAVITY*dt;jy+=jvy*dt;if(jy>0){jy=0;jvy=0;}const row=getRow(camZ+PZ);
 const ballW=0.15;
 const colL=Math.max(0,Math.min(COLS-1,Math.floor(px+THW-ballW)));
 const colR=Math.max(0,Math.min(COLS-1,Math.floor(px+THW+ballW)));
@@ -717,43 +717,13 @@ function drawEnterName(){
   cx.textAlign='left';
 }
 
-function drawTouchControls(){
-  // Left joystick
-  if(joyActive){
-    cx.strokeStyle='rgba(0,255,255,.35)';cx.lineWidth=3;
-    cx.beginPath();cx.arc(joyBaseX,joyBaseY,JOY_MAX,0,Math.PI*2);cx.stroke();
-    cx.fillStyle='rgba(0,255,255,.45)';
-    cx.beginPath();cx.arc(joyCurX,joyCurY,28,0,Math.PI*2);cx.fill();
-    cx.strokeStyle='#00ffff';cx.lineWidth=2;
-    cx.beginPath();cx.arc(joyCurX,joyCurY,28,0,Math.PI*2);cx.stroke();
-  } else {
-    // Hint circle bottom-left
-    cx.strokeStyle='rgba(255,255,255,.12)';cx.lineWidth=2;
-    cx.beginPath();cx.arc(W*0.18,H-90,JOY_MAX,0,Math.PI*2);cx.stroke();
-    cx.fillStyle='rgba(255,255,255,.2)';cx.font='12px Share Tech Mono, monospace';cx.textAlign='center';
-    cx.fillText('STYR',W*0.18,H-86);
-  }
+// Touch controls moved to HTML
   // Right jump button
   const jx=W*0.82, jy2=H-90, jr=64;
   cx.fillStyle=tJ?'rgba(255,0,255,.35)':'rgba(255,255,255,.07)';
   cx.beginPath();cx.arc(jx,jy2,jr,0,Math.PI*2);cx.fill();
   cx.strokeStyle=tJ?'#ff00ff':'rgba(255,255,255,.2)';cx.lineWidth=2;
-  cx.beginPath();cx.arc(jx,jy2,jr,0,Math.PI*2);cx.stroke();
-  cx.fillStyle=tJ?'#ff00ff':'rgba(255,255,255,.5)';
-  cx.font='bold 16px Share Tech Mono, monospace';cx.textAlign='center';
-  cx.fillText('HOPP',jx,jy2+6);
-  // Mobile warning
-  const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-  if(isMobile){
-    const ww=320,wh=44,wx=cx0-ww/2,wy=H-60;
-    cx.fillStyle='rgba(255,160,0,.15)';cx.fillRect(wx,wy,ww,wh);
-    cx.strokeStyle='#ffaa00';cx.lineWidth=1;cx.strokeRect(wx,wy,ww,wh);
-    cx.fillStyle='#ffaa00';cx.font='11px Share Tech Mono, monospace';cx.textAlign='center';
-    cx.fillText('⚠️ Dette spillet er best på PC',cx0,wy+18);
-    cx.fillText('med tastatur',cx0,wy+33);
-  }
-  cx.textAlign='left';
-}
+// Touch controls moved to HTML
 
 function drawSkinSelect(){
   const cx0=W/2;
@@ -948,7 +918,6 @@ function loop(t){
       else if(menuState==='skinselect')drawSkinSelect();
     } else {
       drawBg();drawTrack();drawParticles();drawBall();drawHUD();
-      if(IS_TOUCH && state==='play')drawTouchControls();
       if(state==='dead')drawOverlay('GAME OVER',gameMode==='select'?'':'Score: '+score,'');
 
       if(state==='levelcomplete')drawLevelComplete();
