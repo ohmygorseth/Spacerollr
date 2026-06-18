@@ -173,7 +173,7 @@ function nextLevel(){
 const K={};
 let tL=0,tR=0,tJ=0;
 // Touch device detection
-const IS_TOUCH = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+const IS_TOUCH = ('ontouchstart' in window)||(navigator.maxTouchPoints>0);
 
 // ── Hidden input for mobile keyboard during name entry ──
 const mobileNameInput = document.createElement('input');
@@ -910,6 +910,7 @@ resizeCanvas();
 state='start';reset();state='start';
 function loop(t){
   requestAnimationFrame(loop);
+  window.gameState=state;
   try{
     update(t);
     if(state==='start'){
