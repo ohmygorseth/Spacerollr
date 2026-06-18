@@ -911,6 +911,7 @@ state='start';reset();state='start';
 function loop(t){
   requestAnimationFrame(loop);
   window.gameState=state;
+  if(window.onGameStateChange)window.onGameStateChange(state);
   try{
     update(t);
     if(state==='start'){
